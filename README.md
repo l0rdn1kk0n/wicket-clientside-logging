@@ -1,0 +1,2 @@
+wicket-clientside-logging
+=========================
