@@ -209,7 +209,7 @@
         data.timestamp = (new Date()).toUTCString();
 
         if (defaults.collectionType === "single") {
-            sendQueue([data]);
+            sendQueue([data], true);
         }
         else if (defaults.collectionType === "timer") {
             queue.push(data);
@@ -218,7 +218,7 @@
             queue.push(data);
 
             if (queue.length >= defaults.maxQueueSize) {
-                flushMessages();
+                flushMessages(true);
             }
         }
         else {
@@ -228,20 +228,26 @@
 
     /**
      * flushs all queued messages to the backend.
+     *
+     * @param async whether to send messages asynchronously or not
      */
-    function flushMessages() {
-        sendQueue(queue);
+    function flushMessages(async) {
+        sendQueue(queue, async);
     }
 
     /**
      * executes the ajax call
      *
      * @param q an array of log messages
+     * @param async whether to send messages asynchronously or not
      */
-    function sendQueue(q) {
+    function sendQueue(q, async) {
         if (!q || q.length <= 0) {
             return;
         }
+
+        // default mode is async
+        async = async !== false;
 
         var data = appendClientInfo({}), i = 1;
 
@@ -258,6 +264,8 @@
         $.ajax({
             type: defaults.method,
             url: defaults.url,
+            cache: false,
+            async: async,
             data: data
         });
     }
@@ -344,13 +352,13 @@
 
         if (defaults.collectionType === "timer") {
             win.setInterval(function () {
-                flushMessages();
+                flushMessages(true);
             }, defaults.collectionTimer);
         }
 
         if (defaults.flushMessagesOnUnload === true) {
             $(window).unload(function () {
-                flushMessages();
+                flushMessages(false);
             });
         }
 
