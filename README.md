@@ -77,6 +77,29 @@ Configuration of ClientSideErrorLoggingBehavior:
 		.loggerName(name)				// Sets the logger name that is used on client side, e.g. name="Log": Log.info('message'); (default: Log)
 	.build();
 
+### QA
+
+#### How to change log format on server side?
+
+<pre><code>public class MyApplication extends WebApplication {
+  protected void init() {
+    ClientSideErrorLoggingSettings settings = new ClientSideErrorLoggingSettings();
+  
+    settings.logger(new IClientLogger.DefaultClientLogger(settings.id()) {
+        protected String newLogMessage(ClientSideLogObject logObject, ClientInfos clientInfos, ILogCleaner cleaner) {
+            return String.format("[%s] %s; UserAgent: %s; WindowSize: %s", 
+                cleaner.toCleanPath(clientInfos.ajaxBaseUrl()), 
+                logObject, 
+                cleaner.clean(clientInfos.userAgent()),
+                cleaner.clean(clientInfos.windowSize()));
+        }  
+    });
+
+    ClientSideErrorLoggingSettings.install(this, settings);
+  }
+}
+</code></pre>
+
 ## Bug tracker
 
 Have a bug? Please create an issue here on GitHub!
