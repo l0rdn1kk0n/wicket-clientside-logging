@@ -1,6 +1,6 @@
 # WICKET CLIENTSIDE LOGGING
 
-wicket-clientside-logging is a helper library to allow javascript logging on client side that will be stored on server side.
+wicket-clientside-logging is a helper library that allows javascript logging on client side, all log messages will be stored on server side too.
 
 Current build status: [![Build Status](https://buildhive.cloudbees.com/job/l0rdn1kk0n/job/wicket-clientside-logging/badge/icon)](https://buildhive.cloudbees.com/job/l0rdn1kk0n/job/wicket-clientside-logging/) [![Build Status](https://travis-ci.org/l0rdn1kk0n/wicket-clientside-logging.png?branch=master)](https://travis-ci.org/l0rdn1kk0n/wicket-clientside-logging)
 
