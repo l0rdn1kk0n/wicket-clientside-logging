@@ -48,6 +48,9 @@ function myFunc() {
 }
 </code></pre>
 
+Supported log methods: `error`, `warn`, `info`, `debug` and `trace`
+A log method won't do anything as long as you don't use a log level that contains the level of the method. The default log level is set to `error` which means that methods like `warn`, `info`, `debug` and `trace` won't send data to the server.
+
 ## Configuration
 
 There are some default arguments that you can override.
