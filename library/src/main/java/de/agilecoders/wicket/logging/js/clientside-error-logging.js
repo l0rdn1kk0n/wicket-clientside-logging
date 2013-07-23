@@ -357,7 +357,7 @@
         }
 
         if (defaults.flushMessagesOnUnload === true) {
-            $(window).unload(function () {
+            $(window).on('beforeunload', function () {
                 flushMessages(false);
             });
         }
