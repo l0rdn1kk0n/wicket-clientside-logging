@@ -109,7 +109,7 @@ https://github.com/l0rdn1kk0n/wicket-clientside-logging/issues
 ## How to get help and news
 
 * Keep up to date on announcements and more by following me [@l0rdn1kk0n](http://twitter.com/l0rdn1kk0n) on Twitter
-* how to use wicket-bootstrap? Read the documentation on https://github.com/l0rdn1kk0n/wicket-clientside-logging/wiki.
+* how to use Wicket Clientside Logging? Read the documentation on https://github.com/l0rdn1kk0n/wicket-clientside-logging/wiki.
 * read more on my [blog](http://blog.agilecoders.de/).
 
 ## Versioning
