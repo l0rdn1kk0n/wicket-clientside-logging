@@ -88,7 +88,7 @@ public class ClientSideErrorLoggingSettings {
      * @return this instance for chaining
      */
     public ClientSideErrorLoggingSettings cleaner(final ILogCleaner cleaner) {
-        this.cleaner = cleaner;
+        this.cleaner = Args.notNull(cleaner, "cleaner");
         return this;
     }
 
@@ -99,7 +99,7 @@ public class ClientSideErrorLoggingSettings {
      * @return this instance for chaining
      */
     public ClientSideErrorLoggingSettings logger(final IClientLogger logger) {
-        this.logger = logger;
+        this.logger = Args.notNull(logger, "logger");
         return this;
     }
 
@@ -110,7 +110,7 @@ public class ClientSideErrorLoggingSettings {
      * @return this instance for chaining
      */
     public ClientSideErrorLoggingSettings paramValueExtractor(final IParamValueExtractor paramValueExtractor) {
-        this.paramValueExtractor = paramValueExtractor;
+        this.paramValueExtractor = Args.notNull(paramValueExtractor, "paramValueExtractor");
         return this;
     }
 
@@ -121,7 +121,7 @@ public class ClientSideErrorLoggingSettings {
      * @return this instance for chaining
      */
     public ClientSideErrorLoggingSettings reference(final ResourceReference reference) {
-        this.reference = reference;
+        this.reference = Args.notNull(reference, "reference");
         return this;
     }
 
