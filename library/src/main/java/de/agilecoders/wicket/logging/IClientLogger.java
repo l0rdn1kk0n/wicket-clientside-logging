@@ -49,30 +49,31 @@ public interface IClientLogger {
             final ILogCleaner cleaner = ClientSideErrorLoggingSettings.get().cleaner();
 
             for (ClientSideLogObject logObject : logObjects) {
+                String logMessage = newLogMessage(logObject, clientInfos, cleaner);
                 switch (logObject.level()) {
                     case "error":
                         if (logger.isErrorEnabled()) {
-                            logger.error(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.error(logMessage);
                         }
                         break;
                     case "warn":
                         if (logger.isWarnEnabled()) {
-                            logger.warn(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.warn(logMessage);
                         }
                         break;
                     case "info":
                         if (logger.isInfoEnabled()) {
-                            logger.info(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.info(logMessage);
                         }
                         break;
                     case "debug":
                         if (logger.isDebugEnabled()) {
-                            logger.debug(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.debug(logMessage);
                         }
                         break;
                     case "trace":
                         if (logger.isTraceEnabled()) {
-                            logger.trace(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.trace(logMessage);
                         }
                         break;
                     default:

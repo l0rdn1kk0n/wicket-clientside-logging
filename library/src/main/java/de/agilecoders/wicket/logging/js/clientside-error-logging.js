@@ -227,7 +227,7 @@
     }
 
     /**
-     * flushs all queued messages to the backend.
+     * flushes all queued messages to the backend.
      *
      * @param async whether to send messages asynchronously or not
      */
