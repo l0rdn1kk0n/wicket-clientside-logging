@@ -71,4 +71,31 @@ public interface ILogCleaner {
             return Url.parse(clean(value), Charsets.UTF_8).toString(Url.StringMode.LOCAL);
         }
     }
+
+    /**
+     * A special log cleaner that doesn't clean anything and
+     * only returns given values
+     */
+    public static class NoOpLogCleaner implements ILogCleaner {
+
+        @Override
+        public String clean(String value) {
+            return value;
+        }
+
+        @Override
+        public String toCleanPath(String value) {
+            return value;
+        }
+
+        @Override
+        public String clean(StringValue value) {
+            return value.toString();
+        }
+
+        @Override
+        public String toCleanPath(StringValue value) {
+            return value.toString();
+        }
+    }
 }

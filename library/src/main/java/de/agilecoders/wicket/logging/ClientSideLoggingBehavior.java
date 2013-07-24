@@ -11,8 +11,11 @@ import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.time.Duration;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,15 +25,15 @@ import java.util.Map;
  *
  * @author miha
  */
-public class ClientSideErrorLoggingBehavior extends Behavior {
+public class ClientSideLoggingBehavior extends Behavior {
 
     private final Map<String, Object> data;
 
     /**
      * @return current active settings
      */
-    private static ClientSideErrorLoggingSettings settings() {
-        return ClientSideErrorLoggingSettings.get();
+    private static ClientSideLoggingSettings settings() {
+        return ClientSideLoggingSettings.get();
     }
 
     /**
@@ -96,6 +99,16 @@ public class ClientSideErrorLoggingBehavior extends Behavior {
             return this;
         }
 
+        public Builder collectClientInfos(final boolean value) {
+            data.put("collectClientInfos", value);
+
+            if (DefaultValues.collectClientInfos == value) {
+                data.remove("collectClientInfos");
+            }
+
+            return this;
+        }
+
         public Builder collectionTimer(final Duration value) {
             data.put("collectionTimer", value.getMilliseconds());
 
@@ -137,17 +150,38 @@ public class ClientSideErrorLoggingBehavior extends Behavior {
         }
 
         /**
-         * @return a new {@link ClientSideErrorLoggingBehavior}
+         * @return copy of builder data
          */
-        public ClientSideErrorLoggingBehavior build() {
-            return new ClientSideErrorLoggingBehavior(data);
+        public Map<String, Object> data() {
+            return new HashMap<>(data);
+        }
+
+        /**
+         * @return a new {@link ClientSideLoggingBehavior}
+         */
+        public ClientSideLoggingBehavior build() {
+            return new ClientSideLoggingBehavior(data());
+        }
+
+        /**
+         * @return a new instance of given {@link ClientSideLoggingBehavior} class. This method
+         *         can be used to build sub classes of {@link ClientSideLoggingBehavior}.
+         */
+        public ClientSideLoggingBehavior build(Class<? extends ClientSideLoggingBehavior> clazz) {
+            try {
+                Constructor<? extends ClientSideLoggingBehavior> constructor = clazz.getConstructor(Map.class);
+
+                return Args.notNull(constructor, "you have to create a public constructor with one parameter of type Map.class").newInstance(data);
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                throw new WicketRuntimeException(e);
+            }
         }
     }
 
     /**
      * Construct.
      */
-    public ClientSideErrorLoggingBehavior() {
+    public ClientSideLoggingBehavior() {
         this(new HashMap<String, Object>());
     }
 
@@ -156,7 +190,7 @@ public class ClientSideErrorLoggingBehavior extends Behavior {
      *
      * @param data initial configuration to use
      */
-    private ClientSideErrorLoggingBehavior(final Map<String, Object> data) {
+    public ClientSideLoggingBehavior(final Map<String, Object> data) {
         data.put("url", createCallbackUrl());
         data.put("logLevel", settings().level());
 
@@ -169,7 +203,7 @@ public class ClientSideErrorLoggingBehavior extends Behavior {
 
     @Override
     public void renderHead(Component component, IHeaderResponse response) {
-        final ClientSideErrorLoggingSettings settings = settings();
+        final ClientSideLoggingSettings settings = settings();
 
         response.render(settings.javaScriptHeaderItem());
         response.render(JavaScriptHeaderItem.forScript(createInitializerScript(data), settings.id()));
@@ -206,7 +240,7 @@ public class ClientSideErrorLoggingBehavior extends Behavior {
          * Construct.
          */
         public ClientSideErrorLoggingRR() {
-            super(new Key(ClientSideErrorLoggingBehavior.class.getName(), ClientSideErrorLoggingSettings.get().id(), null, null, null));
+            super(new Key(ClientSideLoggingBehavior.class.getName(), ClientSideLoggingSettings.get().id(), null, null, null));
         }
 
         @Override

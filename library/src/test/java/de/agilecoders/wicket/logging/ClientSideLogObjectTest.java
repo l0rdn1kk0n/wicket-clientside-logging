@@ -19,15 +19,12 @@ public class ClientSideLogObjectTest {
         ClientSideLogObject logObject = new ClientSideLogObject(StringValue.valueOf("error"),
                                                                 StringValue.valueOf("message"),
                                                                 StringValue.valueOf("timestamp"),
-                                                                newSettings());
+                                                                0);
 
         assertThat(logObject.level(), is(equalTo("error")));
         assertThat(logObject.message(), is(equalTo("message")));
         assertThat(logObject.timestamp(), is(equalTo("timestamp")));
-    }
-
-    private ClientSideErrorLoggingSettings newSettings() {
-        return new ClientSideErrorLoggingSettings();
+        assertThat(logObject.index(), is(equalTo(0)));
     }
 
 }

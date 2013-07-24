@@ -18,6 +18,11 @@ public enum CollectionType {
     Timer,
 
     /**
+     * sends all messages before unload event is fired on client side
+     */
+    Unload,
+
+    /**
      * after a configurable (defaults.maxQueueSize) size of queue all queued
      * messages will be sent to backend
      */

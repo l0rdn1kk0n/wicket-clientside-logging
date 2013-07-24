@@ -116,23 +116,27 @@
          * @param lvl the log level to use
          * @param message the message to log
          */
-        consoleLog: function(lvl, message) {
+        consoleLog: function (lvl, message) {
             if (win.console) {
                 var msg = "[" + lvl + "] " + message;
 
                 if (lvl === "error") {
                     if (win.console.error) {
                         win.console.error(msg);
-                    } else if (win.console.log) {
+                    }
+                    else if (win.console.log) {
                         win.console.log(msg);
                     }
-                } else if (lvl === "info") {
+                }
+                else if (lvl === "info") {
                     if (win.console.info) {
                         win.console.info(msg);
-                    } else if (win.console.log) {
+                    }
+                    else if (win.console.log) {
                         win.console.log(msg);
                     }
-                } else if (win.console.log) {
+                }
+                else if (win.console.log) {
                     win.console.log(msg);
                 }
             }
@@ -158,6 +162,7 @@
         wrapWindowOnError: true,
         wrapWicketLog: true,
         flushMessagesOnUnload: true,
+        collectClientInfos: true,
         logLevel: win.WicketClientSideLogging.LVL_ERROR,
         url: null,
         method: 'POST',
@@ -165,7 +170,7 @@
         loggerName: "Log",
         debug: false,
         collectionTimer: 5000,
-        collectionType: "single"  // single, timer, size
+        collectionType: "single"  // single, timer, size, unload
     };
 
     /**
@@ -211,7 +216,7 @@
         if (defaults.collectionType === "single") {
             sendQueue([data], true);
         }
-        else if (defaults.collectionType === "timer") {
+        else if (defaults.collectionType === "timer" || defaults.collectionType === "unload") {
             queue.push(data);
         }
         else if (defaults.collectionType === "size") {
@@ -277,11 +282,78 @@
      * @returns {Object} the enhanced data object
      */
     function appendClientInfo(data) {
-        data.ua = navigator.userAgent;
-        data.ajaxBaseUrl = Wicket.Ajax.baseUrl || '.';
-        data.winSize = $(window).width() + 'x' + $(window).height();
-        data.screenSize = window.screen.availWidth + 'x' + window.screen.availHeight;
+        if (defaults.collectClientInfos === true) {
+            data.ua = navigator.userAgent;
+            data.ajaxBaseUrl = Wicket.Ajax.baseUrl || '.';
+            data.winSize = $(window).width() + 'x' + $(window).height();
+            data.screenSize = window.screen.availWidth + 'x' + window.screen.availHeight;
+        }
         return data;
+    }
+
+    /**
+     * wraps/replaces the original Wicket.Log object
+     *
+     * @type Object
+     */
+    var WrappedWicketLog = {
+        isManipulated: true,
+        origWicketLog: null,
+
+        override: function (origWicketLog) {
+            this.origWicketLog = origWicketLog;
+
+            return this;
+        },
+
+        enabled: function () {
+            return this.origWicketLog.enabled();
+        },
+
+        info: function (msg) {
+            win.WicketClientSideLogging.info(msg);
+
+            if (defaults.wrapWicketLog === true && this.origWicketLog) {
+                this.origWicketLog.info(msg);
+            }
+        },
+
+        error: function (msg) {
+            win.WicketClientSideLogging.error(msg);
+
+            if (defaults.wrapWicketLog === true && this.origWicketLog) {
+                this.origWicketLog.error(msg);
+            }
+        },
+
+        log: function (msg) {
+            win.WicketClientSideLogging.info(msg);
+
+            if (defaults.wrapWicketLog === true && this.origWicketLog) {
+                this.origWicketLog.log(msg);
+            }
+        }
+    };
+
+    /**
+     * creates a wrapped window on error handler
+     *
+     * @param origWindowOnError the original window.onerror handler
+     * @returns {Function} wrapped window.onerror handler
+     */
+    function wrappedWindowOnError(origWindowOnError) {
+        return function (message, file, line) {
+            win.WicketClientSideLogging.error(message + " on [" + file + ":" + line + "]");
+
+            if (defaults.wrapWindowOnError === true && origWindowOnError) {
+                try {
+                    origWindowOnError.call(this, message, file, line);
+                }
+                catch (e) {
+                    /*ignore*/
+                }
+            }
+        }
     }
 
     /**
@@ -299,55 +371,11 @@
         logLevel = toInt(defaults.logLevel);
 
         if (defaults.wrapWindowOnError === true || defaults.replaceWindowOnError === true) {
-            var origWindowOnError = win.onerror;
-
-            win.onerror = function (message, file, line) {
-                win.WicketClientSideLogging.error(message + " on [" + file + ":" + line + "]");
-
-                if (defaults.wrapWindowOnError === true && origWindowOnError) {
-                    try {
-                        origWindowOnError.call(this, message, file, line);
-                    }
-                    catch (e) {
-                        /*ignore*/
-                    }
-                }
-            };
+            win.onerror = wrappedWindowOnError(win.onerror)
         }
 
         if ((defaults.wrapWicketLog === true || defaults.replaceWicketLog === true) && (!W.Log || W.Log.isManipulated !== true)) {
-            var origWicketLog = W.Log;
-            W.Log = {
-                isManipulated: true,
-
-                enabled: function () {
-                    return origWicketLog.enabled();
-                },
-
-                info: function (msg) {
-                    win.WicketClientSideLogging.info(msg);
-
-                    if (defaults.wrapWicketLog === true && origWicketLog) {
-                        origWicketLog.info(msg);
-                    }
-                },
-
-                error: function (msg) {
-                    win.WicketClientSideLogging.error(msg);
-
-                    if (defaults.wrapWicketLog === true && origWicketLog) {
-                        origWicketLog.error(msg);
-                    }
-                },
-
-                log: function (msg) {
-                    win.WicketClientSideLogging.info(msg);
-
-                    if (defaults.wrapWicketLog === true && origWicketLog) {
-                        origWicketLog.log(msg);
-                    }
-                }
-            };
+            W.Log = WrappedWicketLog.override(W.Log)
         }
 
         if (defaults.collectionType === "timer") {
@@ -356,7 +384,7 @@
             }, defaults.collectionTimer);
         }
 
-        if (defaults.flushMessagesOnUnload === true) {
+        if (defaults.flushMessagesOnUnload === true || defaults.collectionType === "unload") {
             $(window).on('beforeunload', function () {
                 flushMessages(false);
             });

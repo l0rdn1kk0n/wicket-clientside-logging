@@ -55,22 +55,23 @@ A log method won't do anything as long as you don't use a log level that contain
 
 There are some default arguments that you can override.
 
-Configuration of ClientSideErrorLoggingSettings:
+Configuration of ClientSideLoggingSettings:
 
-	new ClientSideErrorLoggingSettings()
+	new ClientSideLoggingSettings()
 		.level(level)					// sets the log level for client side logger (default: error)
 		.debug(bool)					// whether to activate debug mode or not; in debug mode all log messages will be written to console.log too (default: false)
 		.logger(logger)					// defines the logger that is used on server side (default: slf4j)
 		.cleaner(cleaner)				// a cleaner is responsible for cleaning log messages; (default: remove all [\r\n\t])
 
-Configuration of ClientSideErrorLoggingBehavior:
+Configuration of ClientSideLoggingBehavior:
 
-	ClientSideErrorLoggingBehavior.newBuilder()
-		.replaceWicketLog()				// whether to replace Wicket.Log or not (default: false)
-		.replaceWindowOnError()			// whether to replace window.onerror or not (default: false)
-		.wrapWicketLog()				// whether to wrap Wicket.Log or not, all calls to Wicket.Log will be sent to server and to original Wicket.Log object (default: true)
-		.wrapWindowOnError()			// whether to wrap window.onerror or not, all window.onerror events will be sent to server and to original window.onerror handler (default: true)
+	ClientSideLoggingBehavior.newBuilder()
+		.replaceWicketLog()				// whether to replace Wicket.Log or not (default: true)
+		.replaceWindowOnError()			// whether to replace window.onerror or not (default: true)
+		.wrapWicketLog()				// whether to wrap Wicket.Log or not, all calls to Wicket.Log will be sent to server and to original Wicket.Log object (default: false)
+		.wrapWindowOnError()			// whether to wrap window.onerror or not, all window.onerror events will be sent to server and to original window.onerror handler (default: false)
 		.flushMessagesOnUnload()		// If set to true all log messages will be sent synchronously to server when a page unload event is fired (default: true)
+		.collectClientInfos()			// If set to true some client data will be collected too; user-agent, screen/window size, ajaxBaseUrl (default: true)
 		.collectionTimer(duration)		// Sets the interval between two server calls, all messages between will be queued, this is only used if collectionType is set to "timer" (default: 5000)
 		.maxQueueSize(size)				// Sets the maximum queue size, if max size is exceeded all messages will be sent to server (default: 10)
 		.collectionType(type)			// Sets the collection type (default: single, other: timer, size)
@@ -83,19 +84,37 @@ Configuration of ClientSideErrorLoggingBehavior:
 
 <pre><code>public class MyApplication extends WebApplication {
   protected void init() {
-    ClientSideErrorLoggingSettings settings = new ClientSideErrorLoggingSettings();
+    ClientSideLoggingSettings settings = new ClientSideLoggingSettings();
   
     settings.logger(new IClientLogger.DefaultClientLogger(settings.id()) {
         protected String newLogMessage(ClientSideLogObject logObject, ClientInfos clientInfos, ILogCleaner cleaner) {
-            return String.format("[%s] %s; UserAgent: %s; WindowSize: %s", 
+            return String.format("[%s] %s; Timestamp: %s; UserAgent: %s; WindowSize: %s",
                 cleaner.toCleanPath(clientInfos.ajaxBaseUrl()), 
-                logObject, 
+                logObject.message(),
+                logObject.timestamp(),
                 cleaner.clean(clientInfos.userAgent()),
                 cleaner.clean(clientInfos.windowSize()));
         }  
     });
 
-    ClientSideErrorLoggingSettings.install(this, settings);
+    ClientSideLoggingSettings.install(this, settings);
+  }
+}
+</code></pre>
+
+#### How to use builder with custom subclass of ClientSideLoggingBehavior?
+
+<pre><code>public class MyApplication extends WebApplication {
+  public MyPage(PageParameters params) {
+    super(params);
+
+    add(ClientSideLoggingBehavior.newBuilder().build(MyClientSideLoggingBehavior.class));
+  }
+
+  public static class MyClientSideLoggingBehavior extends ClientSideLoggingBehavior {
+    public MyClientSideLoggingBehavior(final Map<String, Object> data) {
+        super(data);
+    }
   }
 }
 </code></pre>

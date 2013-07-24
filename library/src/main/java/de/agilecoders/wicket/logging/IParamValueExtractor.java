@@ -1,8 +1,12 @@
 package de.agilecoders.wicket.logging;
 
 import org.apache.wicket.request.IRequestParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,11 +29,13 @@ public interface IParamValueExtractor {
      * Default implementation of {@link IParamValueExtractor}
      */
     public static final class DefaultParamValueExtractor implements IParamValueExtractor {
+        private static final Logger LOG = LoggerFactory.getLogger(DefaultParamValueExtractor.class);
 
         @Override
         public Result parse(IRequestParameters params) {
             final Set<ClientSideLogObject> logObjects = new HashSet<>();
             final ClientInfos clientInfos = new ClientInfos();
+            final List<Integer> parsedIndex = new ArrayList<>();
 
             for (final String paramName : params.getParameterNames()) {
                 final String realParamName = extractRealParamName(paramName);
@@ -40,10 +46,19 @@ public interface IParamValueExtractor {
                     case ParamNames.MESSAGE:
                         final int index = extractIndex(paramName);
 
-                        if (index > -1) {
-                            logObjects.add(new ClientSideLogObject(params.getParameterValue(ParamNames.LEVEL + DefaultValues.paramSplitter + index),
-                                                                   params.getParameterValue(ParamNames.MESSAGE + DefaultValues.paramSplitter + index),
-                                                                   params.getParameterValue(ParamNames.TIMESTAMP + DefaultValues.paramSplitter + index)));
+                        if (index > -1 && !parsedIndex.contains(index)) {
+                            ClientSideLogObject obj = new ClientSideLogObject(params.getParameterValue(ParamNames.LEVEL + DefaultValues.paramSplitter + index),
+                                                                              params.getParameterValue(ParamNames.MESSAGE + DefaultValues.paramSplitter + index),
+                                                                              params.getParameterValue(ParamNames.TIMESTAMP + DefaultValues.paramSplitter + index),
+                                                                              index);
+
+                            if (obj.isValid()) {
+                                logObjects.add(obj);
+                            } else {
+                                LOG.warn("skip log object because it isn't valid: {}", obj);
+                            }
+
+                            parsedIndex.add(index);
                         }
                         break;
 

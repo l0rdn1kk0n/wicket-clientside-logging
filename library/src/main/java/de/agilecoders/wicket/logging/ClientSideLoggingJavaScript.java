@@ -10,23 +10,23 @@ import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import java.util.List;
 
 /**
- * The {@link JavaScriptResourceReference} that represents the "clientside-error-logging.js".
+ * The {@link JavaScriptResourceReference} that represents the "clientside-logging.js".
  *
  * @author miha
  */
-public class ClientSideErrorLoggingJavaScript extends JavaScriptResourceReference {
+public class ClientSideLoggingJavaScript extends JavaScriptResourceReference {
     private static final long serialVersionUID = 1L;
 
     /**
      * Singleton instance of this reference
      */
-    private static final ClientSideErrorLoggingJavaScript INSTANCE = new ClientSideErrorLoggingJavaScript();
+    private static final ClientSideLoggingJavaScript INSTANCE = new ClientSideLoggingJavaScript();
 
 
     /**
      * @return the single instance of the resource reference
      */
-    public static ClientSideErrorLoggingJavaScript instance() {
+    public static ClientSideLoggingJavaScript instance() {
         return INSTANCE;
     }
 
@@ -40,8 +40,8 @@ public class ClientSideErrorLoggingJavaScript extends JavaScriptResourceReferenc
     /**
      * Private constructor.
      */
-    private ClientSideErrorLoggingJavaScript() {
-        super(ClientSideErrorLoggingJavaScript.class, "js/clientside-error-logging.js");
+    private ClientSideLoggingJavaScript() {
+        super(ClientSideLoggingJavaScript.class, "js/clientside-logging.js");
     }
 
     @Override

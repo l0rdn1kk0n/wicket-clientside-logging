@@ -10,18 +10,17 @@ import org.apache.wicket.util.time.Duration;
  */
 public final class DefaultValues {
 
-    public static final boolean replaceWicketLog = false;
-    public static final boolean replaceWindowOnError = false;
-    public static final boolean wrapWindowOnError = true;
-    public static final boolean wrapWicketLog = true;
+    public static final boolean replaceWicketLog = true;
+    public static final boolean replaceWindowOnError = true;
+    public static final boolean wrapWindowOnError = false;
+    public static final boolean wrapWicketLog = false;
     public static final boolean flushMessagesOnUnload = true;
 
-    public static final String logLevel = "error";
-    public static final String method = "POST";
     public static final int maxQueueSize = 10;
     public static final String loggerName = "Log";
     public static final long collectionTimer = Duration.seconds(5).getMilliseconds();
     public static final CollectionType collectionType = CollectionType.Single;
+    public static final boolean collectClientInfos = true;
 
     public static final String defaultMessage = "NULL_MSG";
     public static final String defaultTimestamp = "NULL_TIMESTAMP";

@@ -12,11 +12,11 @@ import org.apache.wicket.util.lang.Args;
  *
  * @author miha
  */
-public class ClientSideErrorLoggingSettings {
+public class ClientSideLoggingSettings {
     /**
-     * The {@link org.apache.wicket.MetaDataKey} used to retrieve the {@link ClientSideErrorLoggingSettings} from the Wicket {@link Appendable}.
+     * The {@link org.apache.wicket.MetaDataKey} used to retrieve the {@link ClientSideLoggingSettings} from the Wicket {@link Appendable}.
      */
-    private static final MetaDataKey<ClientSideErrorLoggingSettings> ClientSideErrorLoggingSettings_METADATA_KEY = new MetaDataKey<ClientSideErrorLoggingSettings>() {
+    private static final MetaDataKey<ClientSideLoggingSettings> ClientSideErrorLoggingSettings_METADATA_KEY = new MetaDataKey<ClientSideLoggingSettings>() {
     };
 
     /**
@@ -25,7 +25,7 @@ public class ClientSideErrorLoggingSettings {
      * @param application the application to add the settings to
      */
     public static void install(final WebApplication application) {
-        install(application, new ClientSideErrorLoggingSettings());
+        install(application, new ClientSideLoggingSettings());
     }
 
     /**
@@ -34,27 +34,27 @@ public class ClientSideErrorLoggingSettings {
      * @param application the application to add the settings to
      * @param settings    the settings to add
      */
-    public static void install(final WebApplication application, final ClientSideErrorLoggingSettings settings) {
+    public static void install(final WebApplication application, final ClientSideLoggingSettings settings) {
         Args.notNull(application, "application").setMetaData(ClientSideErrorLoggingSettings_METADATA_KEY,
                                                              Args.notNull(settings, "settings"));
     }
 
     /**
-     * returns the {@link ClientSideErrorLoggingSettings} which are assigned to given application
+     * returns the {@link ClientSideLoggingSettings} which are assigned to given application
      *
      * @param app The current application
-     * @return assigned {@link ClientSideErrorLoggingSettings}
+     * @return assigned {@link ClientSideLoggingSettings}
      */
-    public static ClientSideErrorLoggingSettings get(final Application app) {
+    public static ClientSideLoggingSettings get(final Application app) {
         return app.getMetaData(ClientSideErrorLoggingSettings_METADATA_KEY);
     }
 
     /**
-     * returns the {@link ClientSideErrorLoggingSettings} which are assigned to current application
+     * returns the {@link ClientSideLoggingSettings} which are assigned to current application
      *
-     * @return assigned {@link ClientSideErrorLoggingSettings}
+     * @return assigned {@link ClientSideLoggingSettings}
      */
-    public static ClientSideErrorLoggingSettings get() {
+    public static ClientSideLoggingSettings get() {
         if (Application.exists()) {
             return get(Application.get());
         }
@@ -67,7 +67,7 @@ public class ClientSideErrorLoggingSettings {
     private boolean debug = false;
     private ILogCleaner cleaner = new ILogCleaner.DefaultLogCleaner();
     private IClientLogger logger = new IClientLogger.DefaultClientLogger(id);
-    private ResourceReference reference = ClientSideErrorLoggingJavaScript.instance();
+    private ResourceReference reference = ClientSideLoggingJavaScript.instance();
     private IParamValueExtractor paramValueExtractor = new IParamValueExtractor.DefaultParamValueExtractor();
 
     /**
@@ -76,7 +76,7 @@ public class ClientSideErrorLoggingSettings {
      * @param level the error level to use on client side
      * @return this instance for chaining
      */
-    public ClientSideErrorLoggingSettings level(final String level) {
+    public ClientSideLoggingSettings level(final String level) {
         this.level = level;
         return this;
     }
@@ -87,7 +87,7 @@ public class ClientSideErrorLoggingSettings {
      * @param cleaner the log message cleaner
      * @return this instance for chaining
      */
-    public ClientSideErrorLoggingSettings cleaner(final ILogCleaner cleaner) {
+    public ClientSideLoggingSettings cleaner(final ILogCleaner cleaner) {
         this.cleaner = Args.notNull(cleaner, "cleaner");
         return this;
     }
@@ -98,7 +98,7 @@ public class ClientSideErrorLoggingSettings {
      * @param logger the logger implementation to use
      * @return this instance for chaining
      */
-    public ClientSideErrorLoggingSettings logger(final IClientLogger logger) {
+    public ClientSideLoggingSettings logger(final IClientLogger logger) {
         this.logger = Args.notNull(logger, "logger");
         return this;
     }
@@ -109,7 +109,7 @@ public class ClientSideErrorLoggingSettings {
      * @param paramValueExtractor the request parameter parser
      * @return this instance for chaining
      */
-    public ClientSideErrorLoggingSettings paramValueExtractor(final IParamValueExtractor paramValueExtractor) {
+    public ClientSideLoggingSettings paramValueExtractor(final IParamValueExtractor paramValueExtractor) {
         this.paramValueExtractor = Args.notNull(paramValueExtractor, "paramValueExtractor");
         return this;
     }
@@ -120,7 +120,7 @@ public class ClientSideErrorLoggingSettings {
      * @param reference the js reference
      * @return this instance for chaining
      */
-    public ClientSideErrorLoggingSettings reference(final ResourceReference reference) {
+    public ClientSideLoggingSettings reference(final ResourceReference reference) {
         this.reference = Args.notNull(reference, "reference");
         return this;
     }
@@ -131,7 +131,7 @@ public class ClientSideErrorLoggingSettings {
      * @param debug whether to activate debugging or not
      * @return this instance for chaining
      */
-    public ClientSideErrorLoggingSettings debug(final boolean debug) {
+    public ClientSideLoggingSettings debug(final boolean debug) {
         this.debug = debug;
         return this;
     }

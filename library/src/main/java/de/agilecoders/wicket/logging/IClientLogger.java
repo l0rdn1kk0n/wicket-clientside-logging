@@ -46,33 +46,33 @@ public interface IClientLogger {
 
         @Override
         public void log(Iterable<ClientSideLogObject> logObjects, ClientInfos clientInfos) {
-            final ILogCleaner cleaner = ClientSideErrorLoggingSettings.get().cleaner();
+            final ILogCleaner cleaner = ClientSideLoggingSettings.get().cleaner();
 
             for (ClientSideLogObject logObject : logObjects) {
                 switch (logObject.level()) {
                     case "error":
                         if (logger.isErrorEnabled()) {
-                            logger.error(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.error(newLogMessage("error", logObject, clientInfos, cleaner));
                         }
                         break;
                     case "warn":
                         if (logger.isWarnEnabled()) {
-                            logger.warn(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.warn(newLogMessage("warn", logObject, clientInfos, cleaner));
                         }
                         break;
                     case "info":
                         if (logger.isInfoEnabled()) {
-                            logger.info(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.info(newLogMessage("info", logObject, clientInfos, cleaner));
                         }
                         break;
                     case "debug":
                         if (logger.isDebugEnabled()) {
-                            logger.debug(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.debug(newLogMessage("debug", logObject, clientInfos, cleaner));
                         }
                         break;
                     case "trace":
                         if (logger.isTraceEnabled()) {
-                            logger.trace(newLogMessage(logObject, clientInfos, cleaner));
+                            logger.trace(newLogMessage("trace", logObject, clientInfos, cleaner));
                         }
                         break;
                     default:
@@ -83,12 +83,13 @@ public interface IClientLogger {
         /**
          * creates a new log line
          *
+         * @param logLevel the current log level
          * @param logObject the log object that contains message and level
          * @param clientInfos the client information that contains user-agent and ajax base url
          * @param cleaner the log cleaner implementation
          * @return new log message line.
          */
-        protected String newLogMessage(ClientSideLogObject logObject, ClientInfos clientInfos, ILogCleaner cleaner) {
+        protected String newLogMessage(String logLevel, ClientSideLogObject logObject, ClientInfos clientInfos, ILogCleaner cleaner) {
             return String.format("[%s] %s [%s]", cleaner.toCleanPath(clientInfos.ajaxBaseUrl()), logObject, cleaner.clean(clientInfos.userAgent()));
         }
     }

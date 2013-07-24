@@ -27,4 +27,9 @@ public class CollectionTypeTest {
     public void timerAsStringIsCorrect() {
         assertThat(CollectionType.Timer.asString(), is(equalTo("timer")));
     }
+
+    @Test
+    public void unloadAsStringIsCorrect() {
+        assertThat(CollectionType.Unload.asString(), is(equalTo("unload")));
+    }
 }
