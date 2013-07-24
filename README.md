@@ -12,7 +12,7 @@ Current build status: [![Build Status](https://buildhive.cloudbees.com/job/l0rdn
 
 ### Maven
 
-wicket-clientside-logging is [available](http://search.maven.org/#artifactdetails|de.agilecoders.wicket|wicket-clientside-logging|0.1.0|jar) in Maven central repository.
+wicket-clientside-logging is [available](http://search.maven.org/#artifactdetails|de.agilecoders.wicket|wicket-clientside-logging|0.1.1|jar) in Maven central repository.
 
 core maven dependency:
 ```xml
