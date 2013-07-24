@@ -12,10 +12,10 @@ import java.util.Map;
 
 /**
  * A specification of a {@link ClientSideLoggingBehavior.Builder} configuration.
- *
+ * <p/>
  * <p>{@code SpecBuilder} supports parsing configuration off of a string, which
  * makes it especially useful for command-line configuration of a {@code ClientSideLoggingBehavior.Builder}.
- *
+ * <p/>
  * <p>The string syntax is a series of comma-separated keys or key-value pairs,
  * each corresponding to a {@code ClientSideLoggingBehavior.Builder} method.
  *
@@ -75,15 +75,11 @@ public class SpecBuilder {
         final Map<String, Object> data = new HashMap<>();
 
         for (Map.Entry<String, String> keyValue : keyValues.entrySet()) {
-            for (Map.Entry<String, ValueParser<?>> e : VALUE_PARSERS.entrySet()) {
-                if (e.getKey().equals(keyValue.getKey())) {
-                    Object val = e.getValue().parse(keyValue.getValue());
+            ValueParser parser = VALUE_PARSERS.get(keyValue.getKey());
+            Object val = parser.parse(keyValue.getValue());
 
-                    if (val != null) {
-                        data.put(e.getKey(), val);
-                    }
-                    break;
-                }
+            if (val != null) {
+                data.put(keyValue.getKey(), val);
             }
         }
         return data;
