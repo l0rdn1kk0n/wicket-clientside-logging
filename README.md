@@ -25,15 +25,15 @@ core maven dependency:
 ### Backend
 
 <pre><code>// Install settings class; best place to do this is in Application#init()
-ClientSideErrorLoggingSettings.install(Application.get());
+ClientSideLoggingSettings.install(Application.get());
 </code></pre>
 
-<pre><code>// add the ClientSideErrorLoggingBehavior to your page
+<pre><code>// add the ClientSideLoggingBehavior to your page
 public class MyPage extends Page {
   public MyPage(PageParameters params) {
     super(params);
 
-    add(new ClientSideErrorLoggingBehavior());
+    add(new ClientSideLoggingBehavior());
   }
 }
 </code></pre>
