@@ -18,7 +18,7 @@ core maven dependency:
 <pre><code>&lt;dependency&gt;
   &lt;groupId&gt;de.agilecoders.wicket&lt;/groupId&gt;
   &lt;artifactId&gt;wicket-clientside-logging&lt;/artifactId&gt;
-  &lt;version&gt;0.1.0&lt;/version&gt;
+  &lt;version&gt;0.1.1&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 
