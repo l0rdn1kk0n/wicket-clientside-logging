@@ -15,20 +15,23 @@ Current build status: [![Build Status](https://buildhive.cloudbees.com/job/l0rdn
 wicket-clientside-logging is [available](http://search.maven.org/#artifactdetails|de.agilecoders.wicket|wicket-clientside-logging|0.1.0|jar) in Maven central repository.
 
 core maven dependency:
-<pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;de.agilecoders.wicket&lt;/groupId&gt;
-  &lt;artifactId&gt;wicket-clientside-logging&lt;/artifactId&gt;
-  &lt;version&gt;0.1.1&lt;/version&gt;
-&lt;/dependency&gt;
-</code></pre>
+```xml
+<dependency>
+  <groupId>de.agilecoders.wicket</groupId>
+  <artifactId>wicket-clientside-logging</artifactId>
+  <version>0.1.1</version>
+</dependency>
+```
 
 ### Backend
 
-<pre><code>// Install settings class; best place to do this is in Application#init()
+```java
+// Install settings class; best place to do this is in Application#init()
 ClientSideLoggingSettings.install(Application.get());
-</code></pre>
+```
 
-<pre><code>// add the ClientSideLoggingBehavior to your page
+```java
+// add the ClientSideLoggingBehavior to your page
 public class MyPage extends Page {
   public MyPage(PageParameters params) {
     super(params);
@@ -36,17 +39,18 @@ public class MyPage extends Page {
     add(new ClientSideLoggingBehavior());
   }
 }
-</code></pre>
+```
 
 ### Frontend
 
-<pre><code>// use Log object or Wicket.Log on client side
+```javascript
+// use Log object or Wicket.Log on client side
 function myFunc() {
   Log.error("this will be sent to server.");
   Wicket.Log.error("this too.");
   $.Log.error("also this is sent to server...");
 }
-</code></pre>
+```
 
 Supported log methods: `error`, `warn`, `info`, `debug` and `trace`
 A log method won't do anything as long as you don't use a log level that contains the level of the method. The default log level is set to `error` which means that methods like `warn`, `info`, `debug` and `trace` won't send data to the server.
@@ -56,15 +60,15 @@ A log method won't do anything as long as you don't use a log level that contain
 There are some default arguments that you can override.
 
 Configuration of ClientSideLoggingSettings:
-
+```java
 	new ClientSideLoggingSettings()
 		.level(level)					// sets the log level for client side logger (default: error)
 		.debug(bool)					// whether to activate debug mode or not; in debug mode all log messages will be written to console.log too (default: false)
 		.logger(logger)					// defines the logger that is used on server side (default: slf4j)
 		.cleaner(cleaner)				// a cleaner is responsible for cleaning log messages; (default: remove all [\r\n\t])
-
+```
 Configuration of ClientSideLoggingBehavior:
-
+```java
 	ClientSideLoggingBehavior.newBuilder()
 		.replaceWicketLog()				// whether to replace Wicket.Log or not (default: true)
 		.replaceWindowOnError()			// whether to replace window.onerror or not (default: true)
@@ -77,12 +81,13 @@ Configuration of ClientSideLoggingBehavior:
 		.collectionType(type)			// Sets the collection type (default: single, other: timer, size)
 		.loggerName(name)				// Sets the logger name that is used on client side, e.g. name="Log": Log.info('message'); (default: Log)
 	.build();
-
+```
 ### QA
 
 #### How to change log format on server side?
 
-<pre><code>public class MyApplication extends WebApplication {
+```java
+public class MyApplication extends WebApplication {
   protected void init() {
     ClientSideLoggingSettings settings = new ClientSideLoggingSettings();
   
@@ -100,11 +105,12 @@ Configuration of ClientSideLoggingBehavior:
     ClientSideLoggingSettings.install(this, settings);
   }
 }
-</code></pre>
+```
 
 #### How to use builder with custom subclass of ClientSideLoggingBehavior?
 
-<pre><code>public class MyApplication extends WebApplication {
+```java
+public class MyApplication extends WebApplication {
   public MyPage(PageParameters params) {
     super(params);
 
@@ -117,7 +123,7 @@ Configuration of ClientSideLoggingBehavior:
     }
   }
 }
-</code></pre>
+```
 
 ## Bug tracker
 
