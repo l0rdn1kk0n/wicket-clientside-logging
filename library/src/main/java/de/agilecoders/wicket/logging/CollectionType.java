@@ -19,6 +19,8 @@ public enum CollectionType {
 
     /**
      * sends all messages before unload event is fired on client side
+     *
+     * @since 0.1.1
      */
     Unload,
 
@@ -33,5 +35,11 @@ public enum CollectionType {
      */
     public String asString() {
         return name().toLowerCase();
+    }
+
+
+    @Override
+    public String toString() {
+        return asString();
     }
 }

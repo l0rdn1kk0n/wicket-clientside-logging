@@ -44,10 +44,26 @@ public class ClientSideLoggingBehavior extends Behavior {
     }
 
     /**
+     * @param spec the behavior specification
+     * @return new builder object.
+     */
+    public static Builder newBuilder(final String spec) {
+        return new Builder(SpecBuilder.parse(spec).data());
+    }
+
+    /**
      * The builder to configure this behavior
      */
     public static final class Builder {
-        private Map<String, Object> data = new HashMap<>();
+        private final Map<String, Object> data;
+
+        private Builder() {
+            this(new HashMap<String, Object>());
+        }
+
+        private Builder(Map<String, Object> data) {
+            this.data = data;
+        }
 
         public Builder replaceWicketLog(final boolean value) {
             data.put("replaceWicketLog", value);

@@ -55,6 +55,16 @@ public class ClientSideLoggingBehaviorTest {
     }
 
     @Test
+    public void builderWithSpecConstructsCorrectBehaviorWhenUsingNonDefaultSettings() {
+        ClientSideLoggingBehavior.Builder b = ClientSideLoggingBehavior.newBuilder("collectClientInfos=false,collectionType=Unload,collectionTimer=100 seconds");
+
+        assertThat(b.data().size(), is(equalTo(3)));
+        assertThat(b.data().containsKey("collectClientInfos"), is(true));
+        assertThat(b.data().containsKey("collectionType"), is(true));
+        assertThat(b.data().containsKey("collectionTimer"), is(true));
+    }
+
+    @Test
     public void builderConstructsCorrectSubclassOfBehavior() {
         ClientSideLoggingBehavior.Builder b = ClientSideLoggingBehavior.newBuilder();
 

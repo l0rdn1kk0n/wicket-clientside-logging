@@ -78,10 +78,17 @@ Configuration of ClientSideLoggingBehavior:
 		.collectClientInfos()			// If set to true some client data will be collected too; user-agent, screen/window size, ajaxBaseUrl (default: true)
 		.collectionTimer(duration)		// Sets the interval between two server calls, all messages between will be queued, this is only used if collectionType is set to "timer" (default: 5000)
 		.maxQueueSize(size)				// Sets the maximum queue size, if max size is exceeded all messages will be sent to server (default: 10)
-		.collectionType(type)			// Sets the collection type (default: single, other: timer, size)
+		.collectionType(type)			// Sets the collection type (default: single, other: timer, size, unload)
 		.loggerName(name)				// Sets the logger name that is used on client side, e.g. name="Log": Log.info('message'); (default: Log)
 	.build();
 ```
+
+or you can use a string specification to build a `ClientSideLoggingBehavior` (since 0.1.2):
+
+```java
+ClientSideLoggingBehavior.newBuilder("collectClientInfos=false,collectionType=Unload,collectionTimer=100 seconds").build();
+```
+
 ### QA
 
 #### How to change log format on server side?
