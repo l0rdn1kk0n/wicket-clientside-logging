@@ -12,14 +12,14 @@ Current build status: [![Build Status](https://buildhive.cloudbees.com/job/l0rdn
 
 ### Maven
 
-wicket-clientside-logging is [available](http://search.maven.org/#artifactdetails|de.agilecoders.wicket|wicket-clientside-logging|0.1.1|jar) in Maven central repository.
+wicket-clientside-logging is [available](http://search.maven.org/#artifactdetails|de.agilecoders.wicket|wicket-clientside-logging|0.1.2|jar) in Maven central repository.
 
 core maven dependency:
 ```xml
 <dependency>
   <groupId>de.agilecoders.wicket</groupId>
   <artifactId>wicket-clientside-logging</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
 </dependency>
 ```
 
@@ -117,7 +117,7 @@ public class MyApplication extends WebApplication {
 #### How to use builder with custom subclass of ClientSideLoggingBehavior?
 
 ```java
-public class MyApplication extends WebApplication {
+public class MyPage extends WebPage {
   public MyPage(PageParameters params) {
     super(params);
 
