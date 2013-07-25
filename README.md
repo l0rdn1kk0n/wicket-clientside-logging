@@ -132,6 +132,11 @@ public class MyPage extends WebPage {
 }
 ```
 
+## Authors
+
+[![Ohloh profile for Michael Haitz](https://www.ohloh.net/accounts/235496/widgets/account_detailed.gif)](https://www.ohloh.net/accounts/235496?ref=Detailed) 
+
+
 ## Bug tracker
 
 Have a bug? Please create an issue here on GitHub!
