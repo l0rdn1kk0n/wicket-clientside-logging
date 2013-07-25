@@ -99,7 +99,7 @@ public class MyApplication extends WebApplication {
     ClientSideLoggingSettings settings = new ClientSideLoggingSettings();
   
     settings.logger(new IClientLogger.DefaultClientLogger(settings.id()) {
-        protected String newLogMessage(ClientSideLogObject logObject, ClientInfos clientInfos, ILogCleaner cleaner) {
+        protected String newLogMessage(String level, ClientSideLogObject logObject, ClientInfos clientInfos, ILogCleaner cleaner) {
             return String.format("[%s] %s; Timestamp: %s; UserAgent: %s; WindowSize: %s",
                 cleaner.toCleanPath(clientInfos.ajaxBaseUrl()), 
                 logObject.message(),
