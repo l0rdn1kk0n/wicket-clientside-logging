@@ -75,6 +75,24 @@ public class ClientSideLoggingBehavior extends Behavior {
             return this;
         }
 
+        /**
+         * if set to "FALSE", only the first window.onerror will be
+         * sent to server.
+         *
+         * @since 0.1.3
+         * @param value whether to log all window.onerror or not
+         * @return this instance for chaining
+         */
+        public Builder logAdditionalErrors(final boolean value) {
+            data.put("logAdditionalErrors", value);
+
+            if (DefaultValues.logAdditionalErrors == value) {
+                data.remove("logAdditionalErrors");
+            }
+
+            return this;
+        }
+
         public Builder replaceWindowOnError(final boolean value) {
             data.put("replaceWindowOnError", value);
 

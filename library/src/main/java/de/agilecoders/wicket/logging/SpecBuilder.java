@@ -28,6 +28,7 @@ public class SpecBuilder {
             .put("replaceWindowOnError", new BooleanParser(DefaultValues.replaceWindowOnError))
             .put("wrapWicketLog", new BooleanParser(DefaultValues.wrapWicketLog))
             .put("wrapWindowOnError", new BooleanParser(DefaultValues.wrapWindowOnError))
+            .put("logAdditionalErrors", new BooleanParser(DefaultValues.logAdditionalErrors))
             .put("flushMessagesOnUnload", new BooleanParser(DefaultValues.flushMessagesOnUnload))
             .put("collectClientInfos", new BooleanParser(DefaultValues.collectClientInfos))
             .put("collectionTimer", new DurationParser(DefaultValues.collectionTimer))

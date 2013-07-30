@@ -140,6 +140,7 @@ public class ClientSideLoggingSettings {
     /**
      * whether to log stacktrace or not
      *
+     * @since 0.1.3
      * @param value whether to log stacktrace
      * @return this instance for chaining
      */
@@ -169,6 +170,7 @@ public class ClientSideLoggingSettings {
     public boolean debug() { return debug; }
 
     /**
+     * @since 0.1.3
      * @return TRUE, if stacktrace should be logged
      */
     public boolean logStacktrace() { return logStacktrace; }

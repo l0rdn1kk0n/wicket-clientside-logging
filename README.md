@@ -65,6 +65,7 @@ Configuration of ClientSideLoggingSettings:
 		.level(level)					// sets the log level for client side logger (default: error)
 		.debug(bool)					// whether to activate debug mode or not; in debug mode all log messages will be written to console.log too (default: false)
 		.logger(logger)					// defines the logger that is used on server side (default: slf4j)
+		.stacktrace(bool)				// whether to collect stacktrace on server side or not (default: false)
 		.cleaner(cleaner)				// a cleaner is responsible for cleaning log messages; (default: remove all [\r\n\t])
 ```
 Configuration of ClientSideLoggingBehavior:
@@ -74,6 +75,7 @@ Configuration of ClientSideLoggingBehavior:
 		.replaceWindowOnError()			// whether to replace window.onerror or not (default: true)
 		.wrapWicketLog()				// whether to wrap Wicket.Log or not, all calls to Wicket.Log will be sent to server and to original Wicket.Log object (default: false)
 		.wrapWindowOnError()			// whether to wrap window.onerror or not, all window.onerror events will be sent to server and to original window.onerror handler (default: false)
+		.logAdditionalErrors()			// whether to log all window.onerror messages or just the first one (default: true)
 		.flushMessagesOnUnload()		// If set to true all log messages will be sent synchronously to server when a page unload event is fired (default: true)
 		.collectClientInfos()			// If set to true some client data will be collected too; user-agent, screen/window size, ajaxBaseUrl (default: true)
 		.collectionTimer(duration)		// Sets the interval between two server calls, all messages between will be queued, this is only used if collectionType is set to "timer" (default: 5000)
@@ -86,7 +88,7 @@ Configuration of ClientSideLoggingBehavior:
 or you can use a string specification to build a `ClientSideLoggingBehavior` (since 0.1.2):
 
 ```java
-ClientSideLoggingBehavior.newBuilder("collectClientInfos=false,collectionType=Unload,collectionTimer=100 seconds").build();
+ClientSideLoggingBehavior.newBuilder("collectClientInfos=false,collectionType=Timer,collectionTimer=100 seconds").build();
 ```
 
 ### QA

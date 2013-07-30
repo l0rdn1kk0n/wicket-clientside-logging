@@ -163,6 +163,7 @@
 
     var logLevel = 0;
     var queue = [];
+    var noOfWinOnError = 0;
     var defaults = {
         replaceWicketLog: false,
         replaceWindowOnError: false,
@@ -170,6 +171,7 @@
         wrapWicketLog: true,
         flushMessagesOnUnload: true,
         logStacktrace: false,
+        logAdditionalErrors: true,
         collectClientInfos: true,
         logLevel: win.WicketClientSideLogging.LVL_ERROR,
         url: null,
@@ -367,9 +369,13 @@
      */
     function wrappedWindowOnError(origWindowOnError) {
         return function (message, file, line) {
-            var log = message + " on [" + file + ":" + line + "]";
+            noOfWinOnError++;
 
-            win.WicketClientSideLogging.error(log);
+            if (noOfWinOnError == 1 || defaults.logAdditionalErrors) {
+                var log = message + " on [" + file + ":" + line + "]";
+
+                win.WicketClientSideLogging.error(log);
+            }
 
             if (defaults.wrapWindowOnError === true && origWindowOnError) {
                 try {

@@ -16,6 +16,7 @@ public final class DefaultValues {
     public static final boolean wrapWicketLog = false;
     public static final boolean flushMessagesOnUnload = true;
     public static final boolean logStacktrace = false;
+    public static final boolean logAdditionalErrors = true;
 
     public static final int maxQueueSize = 10;
     public static final String loggerName = "Log";
