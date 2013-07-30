@@ -8,6 +8,7 @@ package de.agilecoders.wicket.logging;
 public final class ParamNames {
 
     public static final String TIMESTAMP = "timestamp";
+    public static final String STACKTRACE = "stack";
     public static final String MESSAGE = "msg";
     public static final String LEVEL = "lvl";
 

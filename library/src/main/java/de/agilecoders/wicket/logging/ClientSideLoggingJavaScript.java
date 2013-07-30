@@ -50,6 +50,10 @@ public class ClientSideLoggingJavaScript extends JavaScriptResourceReference {
         dependencies.add(JavaScriptHeaderItem.forReference(Application.get().getJavaScriptLibrarySettings().getJQueryReference()));
         dependencies.add(JavaScriptHeaderItem.forReference(WicketAjaxJQueryResourceReference.get()));
 
+        if (ClientSideLoggingSettings.get().logStacktrace()) {
+            dependencies.add(StacktraceJavaScript.asHeaderItem());
+        }
+
         return dependencies;
     }
 }

@@ -65,6 +65,7 @@ public class ClientSideLoggingSettings {
     private String id = "client-side-logging";
     private String level = "error";
     private boolean debug = false;
+    private boolean logStacktrace = false;
     private ILogCleaner cleaner = new ILogCleaner.DefaultLogCleaner();
     private IClientLogger logger = new IClientLogger.DefaultClientLogger(id);
     private ResourceReference reference = ClientSideLoggingJavaScript.instance();
@@ -137,6 +138,17 @@ public class ClientSideLoggingSettings {
     }
 
     /**
+     * whether to log stacktrace or not
+     *
+     * @param value whether to log stacktrace
+     * @return this instance for chaining
+     */
+    public ClientSideLoggingSettings logStacktrace(final boolean value) {
+        this.logStacktrace = value;
+        return this;
+    }
+
+    /**
      * @return client side log level
      */
     public String level() { return level; }
@@ -155,6 +167,11 @@ public class ClientSideLoggingSettings {
      * @return use debug mode on client side
      */
     public boolean debug() { return debug; }
+
+    /**
+     * @return TRUE, if stacktrace should be logged
+     */
+    public boolean logStacktrace() { return logStacktrace; }
 
     /**
      * @return request parameter parser

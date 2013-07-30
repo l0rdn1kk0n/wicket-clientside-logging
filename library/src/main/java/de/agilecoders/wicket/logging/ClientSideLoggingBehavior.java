@@ -210,6 +210,10 @@ public class ClientSideLoggingBehavior extends Behavior {
         data.put("url", createCallbackUrl());
         data.put("logLevel", settings().level());
 
+        if (settings().logStacktrace() != DefaultValues.logStacktrace) {
+            data.put("logStacktrace", settings().logStacktrace());
+        }
+
         if (settings().debug()) {
             data.put("debug", true);
         }

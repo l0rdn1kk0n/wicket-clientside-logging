@@ -44,12 +44,14 @@ public interface IParamValueExtractor {
                     case ParamNames.TIMESTAMP:
                     case ParamNames.LEVEL:
                     case ParamNames.MESSAGE:
+                    case ParamNames.STACKTRACE:
                         final int index = extractIndex(paramName);
 
                         if (index > -1 && !parsedIndex.contains(index)) {
                             ClientSideLogObject obj = new ClientSideLogObject(params.getParameterValue(ParamNames.LEVEL + DefaultValues.paramSplitter + index),
                                                                               params.getParameterValue(ParamNames.MESSAGE + DefaultValues.paramSplitter + index),
                                                                               params.getParameterValue(ParamNames.TIMESTAMP + DefaultValues.paramSplitter + index),
+                                                                              params.getParameterValue(ParamNames.STACKTRACE + DefaultValues.paramSplitter + index),
                                                                               index);
 
                             if (obj.isValid()) {

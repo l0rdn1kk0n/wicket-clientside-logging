@@ -52,7 +52,7 @@
          * @param message the message to log
          */
         error: function (message) {
-            this.log(this.LVL_ERROR, message);
+            this.log(this.LVL_ERROR, message, stacktrace());
         },
 
         /**
@@ -61,7 +61,7 @@
          * @param message the message to log
          */
         warn: function (message) {
-            this.log(this.LVL_WARN, message);
+            this.log(this.LVL_WARN, message, "");
         },
 
         /**
@@ -70,7 +70,7 @@
          * @param message the message to log
          */
         info: function (message) {
-            this.log(this.LVL_INFO, message);
+            this.log(this.LVL_INFO, message, "");
         },
 
         /**
@@ -79,7 +79,7 @@
          * @param message the message to log
          */
         debug: function (message) {
-            this.log(this.LVL_DEBUG, message);
+            this.log(this.LVL_DEBUG, message, "");
         },
 
         /**
@@ -88,7 +88,7 @@
          * @param message the message to log
          */
         trace: function (message) {
-            this.log(this.LVL_TRACE, message);
+            this.log(this.LVL_TRACE, message, "");
         },
 
         /**
@@ -96,17 +96,19 @@
          *
          * @param lvl the log level to use
          * @param message the message to log
+         * @param stacktrace current stacktrace
          */
-        log: function (lvl, message) {
+        log: function (lvl, message, stacktrace) {
             if (this.isLoggingActive(lvl)) {
                 sendMessage({
                     lvl: lvl,
+                    stack: stacktrace,
                     msg: message
                 });
             }
 
             if (defaults.debug === true) {
-                this.consoleLog(lvl, message);
+                this.consoleLog(lvl, message, stacktrace);
             }
         },
 
@@ -115,10 +117,15 @@
          *
          * @param lvl the log level to use
          * @param message the message to log
+         * @param stacktrace current stacktrace
          */
-        consoleLog: function (lvl, message) {
+        consoleLog: function (lvl, message, stacktrace) {
             if (win.console) {
                 var msg = "[" + lvl + "] " + message;
+
+                if (stacktrace && stacktrace != "") {
+                    msg += "\n" + stacktrace;
+                }
 
                 if (lvl === "error") {
                     if (win.console.error) {
@@ -162,6 +169,7 @@
         wrapWindowOnError: true,
         wrapWicketLog: true,
         flushMessagesOnUnload: true,
+        logStacktrace: false,
         collectClientInfos: true,
         logLevel: win.WicketClientSideLogging.LVL_ERROR,
         url: null,
@@ -216,7 +224,7 @@
         if (defaults.collectionType === "single") {
             sendQueue([data], true);
         }
-        else if (defaults.collectionType === "timer" || defaults.collectionType === "unload") {
+        else if (defaults.collectionType === "timer" || defaults.collectionType === "unload") {
             queue.push(data);
         }
         else if (defaults.collectionType === "size") {
@@ -263,6 +271,10 @@
             data["msg_" + i] = e.msg;
             data["lvl_" + i] = e.lvl;
 
+            if (defaults.logStacktrace && e.stack) {
+                data["stack_" + i] = e.stack;
+            }
+
             i++;
         }
 
@@ -273,6 +285,18 @@
             async: async,
             data: data
         });
+    }
+
+    /**
+     * @returns {string} current stacktrace
+     */
+    function stacktrace() {
+        if (defaults.logStacktrace && win["printStackTrace"]) {
+            return win.printStackTrace().join("\n");
+        }
+        else {
+            return "";
+        }
     }
 
     /**
@@ -343,7 +367,9 @@
      */
     function wrappedWindowOnError(origWindowOnError) {
         return function (message, file, line) {
-            win.WicketClientSideLogging.error(message + " on [" + file + ":" + line + "]");
+            var log = message + " on [" + file + ":" + line + "]";
+
+            win.WicketClientSideLogging.error(log);
 
             if (defaults.wrapWindowOnError === true && origWindowOnError) {
                 try {
@@ -384,7 +410,7 @@
             }, defaults.collectionTimer);
         }
 
-        if (defaults.flushMessagesOnUnload === true || defaults.collectionType === "unload") {
+        if (defaults.flushMessagesOnUnload === true || defaults.collectionType === "unload") {
             $(window).on('beforeunload', function () {
                 flushMessages(false);
             });

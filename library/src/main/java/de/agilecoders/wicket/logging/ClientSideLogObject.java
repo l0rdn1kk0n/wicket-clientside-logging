@@ -13,32 +13,36 @@ public class ClientSideLogObject {
     private final StringValue lvl;
     private final StringValue message;
     private final StringValue timestamp;
+    private final StringValue stacktrace;
     private final int index;
 
     /**
      * Construct.
      *
-     * @param lvl       the log level as {@link StringValue}
-     * @param message   the message as {@link StringValue}
-     * @param timestamp the timestamp as {@link StringValue} in UTC format.
-     * @param index     the param index
+     * @param lvl        the log level as {@link StringValue}
+     * @param message    the message as {@link StringValue}
+     * @param timestamp  the timestamp as {@link StringValue} in UTC format.
+     * @param stacktrace the client side stacktrace
+     * @param index      the param index
      */
-    public ClientSideLogObject(String lvl, String message, String timestamp, int index) {
-        this(StringValue.valueOf(lvl), StringValue.valueOf(message), StringValue.valueOf(timestamp), index);
+    public ClientSideLogObject(String lvl, String message, String timestamp, String stacktrace, int index) {
+        this(StringValue.valueOf(lvl), StringValue.valueOf(message), StringValue.valueOf(timestamp), StringValue.valueOf(stacktrace), index);
     }
 
     /**
      * Construct.
      *
-     * @param lvl       the log level as {@link StringValue}
-     * @param message   the message as {@link StringValue}
-     * @param timestamp the timestamp as {@link StringValue} in UTC format.
-     * @param index     the param index
+     * @param lvl        the log level as {@link StringValue}
+     * @param message    the message as {@link StringValue}
+     * @param timestamp  the timestamp as {@link StringValue} in UTC format.
+     * @param stacktrace the client side stacktrace as {@link StringValue}
+     * @param index      the param index
      */
-    public ClientSideLogObject(StringValue lvl, StringValue message, StringValue timestamp, int index) {
+    public ClientSideLogObject(StringValue lvl, StringValue message, StringValue timestamp, StringValue stacktrace, int index) {
         this.lvl = lvl;
         this.message = message;
         this.timestamp = timestamp;
+        this.stacktrace = stacktrace;
         this.index = index;
     }
 
@@ -54,6 +58,13 @@ public class ClientSideLogObject {
      */
     public String level() {
         return lvl.toString("error");
+    }
+
+    /**
+     * @return stacktrace or empty string if non is set
+     */
+    public String stacktrace() {
+        return stacktrace.toString("");
     }
 
     /**
@@ -92,6 +103,9 @@ public class ClientSideLogObject {
         if (message != null ? !message.equals(logObject.message) : logObject.message != null) {
             return false;
         }
+        if (stacktrace != null ? !stacktrace.equals(logObject.stacktrace) : logObject.stacktrace != null) {
+            return false;
+        }
         if (timestamp != null ? !timestamp.equals(logObject.timestamp) : logObject.timestamp != null) {
             return false;
         }
@@ -103,6 +117,7 @@ public class ClientSideLogObject {
     public int hashCode() {
         int result = lvl != null ? lvl.hashCode() : 0;
         result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + (stacktrace != null ? stacktrace.hashCode() : 0);
         result = 31 * result + (timestamp != null ? timestamp.hashCode() : 0);
         return result;
     }

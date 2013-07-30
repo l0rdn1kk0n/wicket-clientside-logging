@@ -90,7 +90,7 @@ public interface IClientLogger {
          * @return new log message line.
          */
         protected String newLogMessage(String logLevel, ClientSideLogObject logObject, ClientInfos clientInfos, ILogCleaner cleaner) {
-            return String.format("[%s] %s [%s]", cleaner.toCleanPath(clientInfos.ajaxBaseUrl()), logObject, cleaner.clean(clientInfos.userAgent()));
+            return String.format("[%s] %s [%s]; Stack: %s", cleaner.toCleanPath(clientInfos.ajaxBaseUrl()), logObject, cleaner.clean(clientInfos.userAgent()), logObject.stacktrace());
         }
     }
 }
