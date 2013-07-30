@@ -1,5 +1,6 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.webjars.util.WicketWebjars;
 import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
@@ -37,6 +38,8 @@ public class ClientSideLoggingSettings {
     public static void install(final WebApplication application, final ClientSideLoggingSettings settings) {
         Args.notNull(application, "application").setMetaData(ClientSideErrorLoggingSettings_METADATA_KEY,
                                                              Args.notNull(settings, "settings"));
+
+        WicketWebjars.install(application);
     }
 
     /**

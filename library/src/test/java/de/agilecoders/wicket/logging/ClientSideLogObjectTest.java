@@ -19,11 +19,13 @@ public class ClientSideLogObjectTest {
         ClientSideLogObject logObject = new ClientSideLogObject(StringValue.valueOf("error"),
                                                                 StringValue.valueOf("message"),
                                                                 StringValue.valueOf("timestamp"),
+                                                                StringValue.valueOf("stacktrace"),
                                                                 0);
 
         assertThat(logObject.level(), is(equalTo("error")));
         assertThat(logObject.message(), is(equalTo("message")));
         assertThat(logObject.timestamp(), is(equalTo("timestamp")));
+        assertThat(logObject.stacktrace(), is(equalTo("stacktrace")));
         assertThat(logObject.index(), is(equalTo(0)));
     }
 
