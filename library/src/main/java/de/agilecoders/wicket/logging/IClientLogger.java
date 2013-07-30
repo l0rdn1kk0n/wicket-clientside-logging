@@ -93,4 +93,5 @@ public interface IClientLogger {
             return String.format("[%s] %s [%s]; Stack: %s", cleaner.toCleanPath(clientInfos.ajaxBaseUrl()), logObject, cleaner.clean(clientInfos.userAgent()), logObject.stacktrace());
         }
     }
+
 }

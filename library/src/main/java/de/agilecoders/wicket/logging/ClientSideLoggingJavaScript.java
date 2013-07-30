@@ -1,6 +1,7 @@
 package de.agilecoders.wicket.logging;
 
 import com.google.common.collect.Lists;
+import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import org.apache.wicket.Application;
 import org.apache.wicket.ajax.WicketAjaxJQueryResourceReference;
 import org.apache.wicket.markup.head.HeaderItem;
@@ -51,7 +52,7 @@ public class ClientSideLoggingJavaScript extends JavaScriptResourceReference {
         dependencies.add(JavaScriptHeaderItem.forReference(WicketAjaxJQueryResourceReference.get()));
 
         if (ClientSideLoggingSettings.get().logStacktrace()) {
-            dependencies.add(StacktraceJavaScript.asHeaderItem());
+            dependencies.add(JavaScriptHeaderItem.forReference(new WebjarsJavaScriptResourceReference("stacktrace/current/stacktrace.js")));
         }
 
         return dependencies;

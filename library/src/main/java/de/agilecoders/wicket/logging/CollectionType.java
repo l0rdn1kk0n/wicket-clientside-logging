@@ -25,6 +25,14 @@ public enum CollectionType {
     Unload,
 
     /**
+     * stores all messages in local storage and sends them to server if
+     * client isn't busy.
+     *
+     * @since 0.1.3
+     */
+    LocalStorage,
+
+    /**
      * after a configurable (defaults.maxQueueSize) size of queue all queued
      * messages will be sent to backend
      */

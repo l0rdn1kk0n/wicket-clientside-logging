@@ -226,6 +226,16 @@
         if (defaults.collectionType === "single") {
             sendQueue([data], true);
         }
+        else if (defaults.collectionType === "localstorage") {
+            var currentValue = amplify.store("clientside-logging");
+
+            if (!currentValue) {
+                currentValue = [];
+            }
+
+            currentValue.push(data);
+            amplify.store("clientside-logging", currentValue);
+        }
         else if (defaults.collectionType === "timer" || defaults.collectionType === "unload") {
             queue.push(data);
         }
@@ -247,7 +257,16 @@
      * @param async whether to send messages asynchronously or not
      */
     function flushMessages(async) {
-        sendQueue(queue, async);
+        if (defaults.collectionType === "localstorage") {
+            var currentValue = amplify.store("clientside-logging");
+
+            if (currentValue && currentValue.length > 0) {
+                sendQueue(currentValue, async);
+            }
+        }
+        else {
+            sendQueue(queue, async);
+        }
     }
 
     /**
@@ -371,7 +390,7 @@
         return function (message, file, line) {
             noOfWinOnError++;
 
-            if (noOfWinOnError == 1 || defaults.logAdditionalErrors) {
+            if (noOfWinOnError == 1 || defaults.logAdditionalErrors) {
                 var log = message + " on [" + file + ":" + line + "]";
 
                 win.WicketClientSideLogging.error(log);
@@ -414,6 +433,14 @@
             win.setInterval(function () {
                 flushMessages(true);
             }, defaults.collectionTimer);
+        }
+
+        if (defaults.collectionType === "localstorage") {
+            $(window).load(function () {
+                win.setTimeout(function () {
+                    flushMessages(true);
+                }, 500);
+            });
         }
 
         if (defaults.flushMessagesOnUnload === true || defaults.collectionType === "unload") {

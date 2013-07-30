@@ -1,5 +1,6 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import org.apache.wicket.Component;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.json.JSONException;
@@ -242,6 +243,13 @@ public class ClientSideLoggingBehavior extends Behavior {
     @Override
     public void renderHead(Component component, IHeaderResponse response) {
         final ClientSideLoggingSettings settings = settings();
+
+        /**
+         * amplify js is used as wrapper for localStorage because each browser comes with its own implementation
+         */
+        if (CollectionType.LocalStorage.asString().equals(data.get("collectionType"))) {
+            response.render(JavaScriptHeaderItem.forReference(new WebjarsJavaScriptResourceReference("amplifyjs/current/amplify.store.min.js")));
+        }
 
         response.render(settings.javaScriptHeaderItem());
         response.render(JavaScriptHeaderItem.forScript(createInitializerScript(data), settings.id()));
