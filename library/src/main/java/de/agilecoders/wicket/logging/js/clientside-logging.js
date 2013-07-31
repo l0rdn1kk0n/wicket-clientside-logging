@@ -56,6 +56,15 @@
         },
 
         /**
+         * logs an error message without a stacktrace
+         *
+         * @param message the message to log
+         */
+        errorWithoutStack: function (message) {
+            this.log(this.LVL_ERROR, message, "");
+        },
+
+        /**
          * logs a warn message
          *
          * @param message the message to log
@@ -327,9 +336,10 @@
      * @returns {Object} the enhanced data object
      */
     function appendClientInfo(data) {
+        data.ajaxBaseUrl = Wicket.Ajax.baseUrl || '.';
+
         if (defaults.collectClientInfos === true) {
             data.ua = navigator.userAgent;
-            data.ajaxBaseUrl = Wicket.Ajax.baseUrl || '.';
             data.winSize = $(window).width() + 'x' + $(window).height();
             data.screenSize = window.screen.availWidth + 'x' + window.screen.availHeight;
         }
@@ -393,7 +403,7 @@
             if (noOfWinOnError == 1 || defaults.logAdditionalErrors) {
                 var log = message + " on [" + file + ":" + line + "]";
 
-                win.WicketClientSideLogging.error(log);
+                win.WicketClientSideLogging.errorWithoutStack(log);
             }
 
             if (defaults.wrapWindowOnError === true && origWindowOnError) {
@@ -441,6 +451,8 @@
                     flushMessages(true);
                 }, 500);
             });
+
+            defaults.flushMessagesOnUnload = false;
         }
 
         if (defaults.flushMessagesOnUnload === true || defaults.collectionType === "unload") {
