@@ -260,6 +260,9 @@
 
             if (currentValue && currentValue.length > 0) {
                 sendQueue(currentValue, async);
+                
+                // empty queue
+                amplify.store("clientside-logging", null);
             }
         }
         else {
