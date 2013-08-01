@@ -25,7 +25,7 @@
  * @author miha
  */
 ;
-(function ($, W, win) {
+(function ($, Wicket, amplify, win) {
     'use strict';
 
     if (typeof(WicketClientSideLogging) === 'object') {
@@ -136,21 +136,8 @@
                     msg += "\n" + stacktrace;
                 }
 
-                if (lvl === "error") {
-                    if (win.console.error) {
-                        win.console.error(msg);
-                    }
-                    else if (win.console.log) {
-                        win.console.log(msg);
-                    }
-                }
-                else if (lvl === "info") {
-                    if (win.console.info) {
-                        win.console.info(msg);
-                    }
-                    else if (win.console.log) {
-                        win.console.log(msg);
-                    }
+                if (win.console[lvl]) {
+                    win.console[lvl(msg)];
                 }
                 else if (win.console.log) {
                     win.console.log(msg);
@@ -189,7 +176,7 @@
         loggerName: "Log",
         debug: false,
         collectionTimer: 5000,
-        collectionType: "single"  // single, timer, size, unload
+        collectionType: "single"  // single, timer, size, unload, localstorage
     };
 
     /**
@@ -226,6 +213,8 @@
      *  - single: each message will be sent to the backend directly
      *  - timer: after a configurable (defaults.collectionTimer) amount of time all queued messages will be sent to backend
      *  - size: after a configurable (defaults.maxQueueSize) size of queue all queued messages will be sent to backend
+     *  - unload: messages will be queued and sent to the backend on page unload
+     *  - localstorage: messages will be collected in localStorage and sent to the backend on next page load
      *
      * @param data the log data to send to backend
      */
@@ -256,7 +245,7 @@
             }
         }
         else {
-            throw new Error("invalid collection type: " + defaults.collectionType + "; must be one of: [single, timer, size]");
+            throw new Error("invalid collection type: " + defaults.collectionType + "; must be one of: [single, timer, size, unload, localstorage]");
         }
     }
 
@@ -340,8 +329,8 @@
 
         if (defaults.collectClientInfos === true) {
             data.ua = navigator.userAgent;
-            data.winSize = $(window).width() + 'x' + $(window).height();
-            data.screenSize = window.screen.availWidth + 'x' + window.screen.availHeight;
+            data.winSize = $(win).width() + 'x' + $(win).height();
+            data.screenSize = win.screen.availWidth + 'x' + win.screen.availHeight;
         }
         return data;
     }
@@ -435,8 +424,8 @@
             win.onerror = wrappedWindowOnError(win.onerror)
         }
 
-        if ((defaults.wrapWicketLog === true || defaults.replaceWicketLog === true) && (!W.Log || W.Log.isManipulated !== true)) {
-            W.Log = WrappedWicketLog.override(W.Log)
+        if ((defaults.wrapWicketLog === true || defaults.replaceWicketLog === true) && (!Wicket.Log || Wicket.Log.isManipulated !== true)) {
+            Wicket.Log = WrappedWicketLog.override(Wicket.Log)
         }
 
         if (defaults.collectionType === "timer") {
@@ -446,7 +435,7 @@
         }
 
         if (defaults.collectionType === "localstorage") {
-            $(window).load(function () {
+            $(win).load(function () {
                 win.setTimeout(function () {
                     flushMessages(true);
                 }, 500);
@@ -456,7 +445,7 @@
         }
 
         if (defaults.flushMessagesOnUnload === true || defaults.collectionType === "unload") {
-            $(window).on('beforeunload', function () {
+            $(win).on('beforeunload', function () {
                 flushMessages(false);
             });
         }
@@ -467,4 +456,4 @@
         }
     };
 
-}(jQuery, Wicket, window));
+}(jQuery, Wicket, amplify, window));
