@@ -1,3 +1,4 @@
+/*jslint browser: true, devel: false, forin: true, plusplus: true, todo: true, vars: true, white: true */
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -25,26 +26,36 @@
  * @author miha
  */
 ;
-(function ($, W, win) {
+(function ($, Wicket, amplify, win) {
     'use strict';
 
-    if (typeof(WicketClientSideLogging) === 'object') {
+    if (typeof win.WicketClientSideLogging === 'object') {
         return;
     }
+
+    var logLevelNames = ["off", "error", "warn", "info", "debug", "trace"];
+    var logLevels = {
+        /* will be generated from logLevelNames, i.e. something like
+        LVL_OFF: 0,
+        LVL_ERROR: 1,
+        LVL_WARN: 2,
+        LVL_INFO: 3,
+        LVL_DEBUG: 4,
+        LVL_TRACE: 5
+        */
+    };
+
+    // automatically generates the logLevel constants as denoted above
+    $.each(logLevelNames, function (i, name) {
+        logLevels["LVL_" + name.toUpperCase()] = i;
+    });
 
     /**
      * Base logger class that's responsible to send log messages.
      *
      * @type Object
      */
-    win.WicketClientSideLogging = {
-
-        LVL_OFF: "off",
-        LVL_ERROR: "error",
-        LVL_WARN: "warn",
-        LVL_INFO: "info",
-        LVL_DEBUG: "debug",
-        LVL_TRACE: "trace",
+    var WicketClientSideLogging = {
 
         /**
          * logs an error message
@@ -52,7 +63,7 @@
          * @param message the message to log
          */
         error: function (message) {
-            this.log(this.LVL_ERROR, message, stacktrace());
+            this.log(logLevels.LVL_ERROR, message, stacktrace());
         },
 
         /**
@@ -61,7 +72,7 @@
          * @param message the message to log
          */
         errorWithoutStack: function (message) {
-            this.log(this.LVL_ERROR, message, "");
+            this.log(logLevels.LVL_ERROR, message, "");
         },
 
         /**
@@ -70,7 +81,7 @@
          * @param message the message to log
          */
         warn: function (message) {
-            this.log(this.LVL_WARN, message, "");
+            this.log(logLevels.LVL_WARN, message, "");
         },
 
         /**
@@ -79,7 +90,7 @@
          * @param message the message to log
          */
         info: function (message) {
-            this.log(this.LVL_INFO, message, "");
+            this.log(logLevels.LVL_INFO, message, "");
         },
 
         /**
@@ -88,7 +99,7 @@
          * @param message the message to log
          */
         debug: function (message) {
-            this.log(this.LVL_DEBUG, message, "");
+            this.log(logLevels.LVL_DEBUG, message, "");
         },
 
         /**
@@ -97,20 +108,22 @@
          * @param message the message to log
          */
         trace: function (message) {
-            this.log(this.LVL_TRACE, message, "");
+            this.log(logLevels.LVL_TRACE, message, "");
         },
 
         /**
          * logs a message
          *
-         * @param lvl the log level to use
+         * @param {number} lvl the log level to use
          * @param message the message to log
          * @param stacktrace current stacktrace
          */
         log: function (lvl, message, stacktrace) {
             if (this.isLoggingActive(lvl)) {
+                var logLevelName = logLevelNames[lvl];
+
                 sendMessage({
-                    lvl: lvl,
+                    lvl: logLevelName,
                     stack: stacktrace,
                     msg: message
                 });
@@ -124,33 +137,22 @@
         /**
          * logs a message to console if available
          *
-         * @param lvl the log level to use
+         * @param {number} lvl the log level to use
          * @param message the message to log
          * @param stacktrace current stacktrace
          */
         consoleLog: function (lvl, message, stacktrace) {
-            if (win.console) {
-                var msg = "[" + lvl + "] " + message;
+            var levelName = logLevelNames[lvl];
 
-                if (stacktrace && stacktrace != "") {
+            if (win.console) {
+                var msg = "[" + levelName + "] " + message;
+
+                if (stacktrace) {
                     msg += "\n" + stacktrace;
                 }
 
-                if (lvl === "error") {
-                    if (win.console.error) {
-                        win.console.error(msg);
-                    }
-                    else if (win.console.log) {
-                        win.console.log(msg);
-                    }
-                }
-                else if (lvl === "info") {
-                    if (win.console.info) {
-                        win.console.info(msg);
-                    }
-                    else if (win.console.log) {
-                        win.console.log(msg);
-                    }
+                if (win.console[levelName]) {
+                    win.console[levelName](msg);
                 }
                 else if (win.console.log) {
                     win.console.log(msg);
@@ -162,15 +164,79 @@
          * checks whether logging is active for given log level
          * or not.
          *
-         * @param lvl the log level to check
+         * @param {number} lvl the log level to check
          * @returns {boolean} TRUE, if logging is active for given log level
          */
         isLoggingActive: function (lvl) {
-            return logLevel > 0 && toInt(lvl) <= logLevel;
+            return defaults.logLevel > 0 && defaults.logLevel >= lvl;
         }
     };
 
-    var logLevel = 0;
+    // merge log levels to WicketClientSideLogging so they are available
+    // via WicketClientSideLogging.LVL_ERROR etc.
+    $.extend(WicketClientSideLogging, logLevels);
+
+    /**
+     * There are several ways of how to send the messages to the backend.
+     *
+     * These methods define how a single message (given via a data object) is handled.
+     */
+    var collectionTypes = {
+        /*
+         * Each message will be sent to the backend directly
+         *
+         * @param {Object} data The log data to send to backend
+         */
+        "single": function (data) {
+            sendQueue([data], true);
+        },
+
+        /*
+         * After a configurable (defaults.collectionTimer) amount of time all queued messages will be sent to backend
+         *
+         * @param {Object} data The log data to send to backend
+         */
+        "timer": function (data) {
+            queue.push(data);
+        },
+
+        /*
+         * After a configurable (defaults.maxQueueSize) size of queue all queued messages will be sent to backend
+         *
+         * @param {Object} data The log data to send to backend
+         */
+        "size": function (data) {
+            queue.push(data);
+
+            if (queue.length >= defaults.maxQueueSize) {
+                flushMessages(true);
+            }
+        },
+
+        /*
+         * Messages will be queued and sent to the backend on page unload
+         *
+         * @param {Object} data The log data to send to backend
+         */
+        "unload": function (data) {
+            queue.push(data);
+        },
+
+        /*
+         * Messages will be collected in localStorage and sent to the backend on next page load
+         */
+        "localstorage": function (data) {
+            var currentValue = amplify.store("clientside-logging");
+
+            if (!currentValue) {
+                currentValue = [];
+            }
+
+            currentValue.push(data);
+            amplify.store("clientside-logging", currentValue);
+        }
+    };
+
     var queue = [];
     var noOfWinOnError = 0;
     var defaults = {
@@ -182,81 +248,45 @@
         logStacktrace: false,
         logAdditionalErrors: true,
         collectClientInfos: true,
-        logLevel: win.WicketClientSideLogging.LVL_ERROR,
+        logLevel: WicketClientSideLogging.LVL_ERROR,
         url: null,
         method: 'POST',
         maxQueueSize: 10,
         loggerName: "Log",
         debug: false,
         collectionTimer: 5000,
-        collectionType: "single"  // single, timer, size, unload
+        collectionType: "single"  // single, timer, size, unload, localstorage
     };
 
     /**
-     * transforms a log level to its integer representation. The
-     * integer representation of a log level is strictly ordered, which
-     * means that trace has a higher value than error.
-     *
-     * @param lvl the log level to transform
-     * @returns {number} integer representation of given log level
+     * Returns an error message for an invalid collection type.
      */
-    function toInt(lvl) {
-        switch (lvl) {
-            case win.WicketClientSideLogging.LVL_OFF:
-                return 0;
-            case win.WicketClientSideLogging.LVL_ERROR:
-                return 1;
-            case win.WicketClientSideLogging.LVL_WARN:
-                return 2;
-            case win.WicketClientSideLogging.LVL_INFO:
-                return 3;
-            case win.WicketClientSideLogging.LVL_DEBUG:
-                return 4;
-            case win.WicketClientSideLogging.LVL_TRACE:
-                return 5;
+    function getInvalidCollectionTypeMessage(type) {
+        var keys = [], key;
+
+        for (key in collectionTypes) {
+            keys.push(key);
         }
 
-        return 0;
+        return "Invalid collection type: " + type + "; must be one of: [" + keys.join(", ") + "]";
     }
 
     /**
      * sends given data to backend according to the current collection
      * type.
      *
-     *  - single: each message will be sent to the backend directly
-     *  - timer: after a configurable (defaults.collectionTimer) amount of time all queued messages will be sent to backend
-     *  - size: after a configurable (defaults.maxQueueSize) size of queue all queued messages will be sent to backend
+     * For information on the available collection types turn to the documentation
+     * on the collectionTypes object.
      *
      * @param data the log data to send to backend
      */
     function sendMessage(data) {
+        var type = defaults.collectionType;
+
         data.timestamp = (new Date()).toUTCString();
 
-        if (defaults.collectionType === "single") {
-            sendQueue([data], true);
-        }
-        else if (defaults.collectionType === "localstorage") {
-            var currentValue = amplify.store("clientside-logging");
-
-            if (!currentValue) {
-                currentValue = [];
-            }
-
-            currentValue.push(data);
-            amplify.store("clientside-logging", currentValue);
-        }
-        else if (defaults.collectionType === "timer" || defaults.collectionType === "unload") {
-            queue.push(data);
-        }
-        else if (defaults.collectionType === "size") {
-            queue.push(data);
-
-            if (queue.length >= defaults.maxQueueSize) {
-                flushMessages(true);
-            }
-        }
-        else {
-            throw new Error("invalid collection type: " + defaults.collectionType + "; must be one of: [single, timer, size]");
+        if (collectionTypes.hasOwnProperty(type)) {
+            collectionTypes[type]();
         }
     }
 
@@ -271,11 +301,42 @@
 
             if (currentValue && currentValue.length > 0) {
                 sendQueue(currentValue, async);
+
+                // clear queue, i.e. remove from localStorage
+                amplify.store("clientside-logging", null);
             }
         }
         else {
             sendQueue(queue, async);
         }
+    }
+
+    /**
+     * Processes the queue to a flat object that contains all data that should
+     * be sent to the backend.
+     *
+     * @param {Array} queue
+     * @return {Object}
+     */
+    function prepareData(queue) {
+        var data = appendClientInfo({}), i = 1;
+
+        while (queue.length > 0) {
+            // removes the item from the queue
+            var e = queue.pop();
+
+            data["timestamp_" + i] = e.timestamp;
+            data["msg_" + i] = e.msg;
+            data["lvl_" + i] = e.lvl;
+
+            if (defaults.logStacktrace && e.stack) {
+                data["stack_" + i] = e.stack;
+            }
+
+            i++;
+        }
+
+        return data;
     }
 
     /**
@@ -292,28 +353,12 @@
         // default mode is async
         async = async !== false;
 
-        var data = appendClientInfo({}), i = 1;
-
-        while (q.length > 0) {
-            var e = q.pop();
-
-            data["timestamp_" + i] = e.timestamp;
-            data["msg_" + i] = e.msg;
-            data["lvl_" + i] = e.lvl;
-
-            if (defaults.logStacktrace && e.stack) {
-                data["stack_" + i] = e.stack;
-            }
-
-            i++;
-        }
-
         $.ajax({
             type: defaults.method,
             url: defaults.url,
             cache: false,
             async: async,
-            data: data
+            data: prepareData(q)
         });
     }
 
@@ -321,12 +366,11 @@
      * @returns {string} current stacktrace
      */
     function stacktrace() {
-        if (defaults.logStacktrace && win["printStackTrace"]) {
+        if (defaults.logStacktrace && win.printStackTrace) {
             return win.printStackTrace().join("\n");
         }
-        else {
-            return "";
-        }
+
+        return "";
     }
 
     /**
@@ -340,8 +384,8 @@
 
         if (defaults.collectClientInfos === true) {
             data.ua = navigator.userAgent;
-            data.winSize = $(window).width() + 'x' + $(window).height();
-            data.screenSize = window.screen.availWidth + 'x' + window.screen.availHeight;
+            data.winSize = $(win).width() + 'x' + $(win).height();
+            data.screenSize = win.screen.availWidth + 'x' + win.screen.availHeight;
         }
         return data;
     }
@@ -366,7 +410,7 @@
         },
 
         info: function (msg) {
-            win.WicketClientSideLogging.info(msg);
+            WicketClientSideLogging.info(msg);
 
             if (defaults.wrapWicketLog === true && this.origWicketLog) {
                 this.origWicketLog.info(msg);
@@ -374,7 +418,7 @@
         },
 
         error: function (msg) {
-            win.WicketClientSideLogging.error(msg);
+            WicketClientSideLogging.error(msg);
 
             if (defaults.wrapWicketLog === true && this.origWicketLog) {
                 this.origWicketLog.error(msg);
@@ -382,7 +426,7 @@
         },
 
         log: function (msg) {
-            win.WicketClientSideLogging.info(msg);
+            WicketClientSideLogging.info(msg);
 
             if (defaults.wrapWicketLog === true && this.origWicketLog) {
                 this.origWicketLog.log(msg);
@@ -400,10 +444,10 @@
         return function (message, file, line) {
             noOfWinOnError++;
 
-            if (noOfWinOnError == 1 || defaults.logAdditionalErrors) {
+            if (noOfWinOnError === 1 || defaults.logAdditionalErrors) {
                 var log = message + " on [" + file + ":" + line + "]";
 
-                win.WicketClientSideLogging.errorWithoutStack(log);
+                WicketClientSideLogging.errorWithoutStack(log);
             }
 
             if (defaults.wrapWindowOnError === true && origWindowOnError) {
@@ -414,31 +458,61 @@
                     /*ignore*/
                 }
             }
-        }
+        };
     }
 
     /**
-     * jquery plugin definition
+     * Converts the given log level to a number. Defaults to logLevels.LVL_ERROR.
      *
-     * @param options these options will override the default options
+     * @param {*} Some representation of a level, either a number or a string
+     *          like "error" or "warn" or anything else.
+     * @return {number}
      */
-    $.wicketClientSideLogging = function (options) {
-        defaults = $.extend(defaults, options || {});
+    function getLogLevelAsNumber(level) {
+        // convert "error", "warn" etc.
+        if (typeof level === "string") {
+            var key = "LVL_" + level.toUpperCase();
 
-        if (!defaults.url || defaults.url.length == 0) {
+            if (logLevels.hasOwnProperty(key)) {
+                level = logLevels[key];
+            }
+        }
+
+        // convert any other non-number value to logLevels.LVL_ERROR
+        if (typeof level !== "number") {
+            level = logLevels.LVL_ERROR;
+        }
+
+        // limit level to a reasonable value, i.e. a non-negative integer 
+        return Math.max(0, Math.floor(level));
+    }
+
+    /**
+     * Initializes the logging.
+     *
+     * @param {Object} options these options will override the default options
+     */
+    function initializeLogging (options) {
+        $.extend(defaults, options || {});
+
+        if (!defaults.url) {
             throw new Error("there's no valid url set: " + defaults.url);
         }
+        
+        if (!collectionTypes.hasOwnProperty(defaults.collectionType)) {
+            throw new Error(getInvalidCollectionTypeMessage(defaults.collectionType));
+        }
 
-        logLevel = toInt(defaults.logLevel);
+        defaults.logLevel = getLogLevelAsNumber(defaults.logLevel);
 
         if (defaults.wrapWindowOnError === true || defaults.replaceWindowOnError === true) {
-            win.onerror = wrappedWindowOnError(win.onerror)
+            win.onerror = wrappedWindowOnError(win.onerror);
         }
 
-        if ((defaults.wrapWicketLog === true || defaults.replaceWicketLog === true) && (!W.Log || W.Log.isManipulated !== true)) {
-            W.Log = WrappedWicketLog.override(W.Log)
+        if ((defaults.wrapWicketLog === true || defaults.replaceWicketLog === true) && (!Wicket.Log || Wicket.Log.isManipulated !== true)) {
+            Wicket.Log = WrappedWicketLog.override(Wicket.Log);
         }
-
+        
         if (defaults.collectionType === "timer") {
             win.setInterval(function () {
                 flushMessages(true);
@@ -446,7 +520,7 @@
         }
 
         if (defaults.collectionType === "localstorage") {
-            $(window).load(function () {
+            $(win).load(function () {
                 win.setTimeout(function () {
                     flushMessages(true);
                 }, 500);
@@ -456,15 +530,24 @@
         }
 
         if (defaults.flushMessagesOnUnload === true || defaults.collectionType === "unload") {
-            $(window).on('beforeunload', function () {
+            $(win).on('beforeunload', function () {
                 flushMessages(false);
             });
         }
 
         if (defaults.loggerName) {
-            win[defaults.loggerName] = win.WicketClientSideLogging;
-            $[defaults.loggerName] = win.WicketClientSideLogging;
+            win[defaults.loggerName] = WicketClientSideLogging;
+            $[defaults.loggerName] = WicketClientSideLogging;
         }
-    };
+    }
 
-}(jQuery, Wicket, window));
+    // allow configuration via WicketClientSideLogging
+    WicketClientSideLogging.initialize = initializeLogging;
+
+    // make WicketClientSideLogging public via window
+    win.WicketClientSideLogging = WicketClientSideLogging;
+
+    // make WicketClientSideLogging configurable via jQuery
+    $.wicketClientSideLogging = initializeLogging;
+
+}(jQuery, Wicket, amplify, window));
