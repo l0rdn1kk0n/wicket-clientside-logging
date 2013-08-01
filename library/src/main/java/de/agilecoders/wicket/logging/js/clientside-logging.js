@@ -1,3 +1,4 @@
+/*jslint browser: true, devel: false, forin: true, plusplus: true, todo: true, vars: true, white: true */
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -28,7 +29,7 @@
 (function ($, Wicket, amplify, win) {
     'use strict';
 
-    if (typeof(WicketClientSideLogging) === 'object') {
+    if (typeof win.WicketClientSideLogging === 'object') {
         return;
     }
 
@@ -146,7 +147,7 @@
             if (win.console) {
                 var msg = "[" + levelName + "] " + message;
 
-                if (stacktrace && stacktrace != "") {
+                if (stacktrace) {
                     msg += "\n" + stacktrace;
                 }
 
@@ -325,9 +326,9 @@
     function prepareData(queue) {
         var data = appendClientInfo({}), i = 1;
 
-        while (q.length > 0) {
+        while (queue.length > 0) {
             // removes the item from the queue
-            var e = q.pop();
+            var e = queue.pop();
 
             data["timestamp_" + i] = e.timestamp;
             data["msg_" + i] = e.msg;
@@ -362,7 +363,7 @@
             url: defaults.url,
             cache: false,
             async: async,
-            data: prepareData(q);
+            data: prepareData(q)
         });
     }
 
@@ -370,12 +371,11 @@
      * @returns {string} current stacktrace
      */
     function stacktrace() {
-        if (defaults.logStacktrace && win["printStackTrace"]) {
+        if (defaults.logStacktrace && win.printStackTrace) {
             return win.printStackTrace().join("\n");
         }
-        else {
-            return "";
-        }
+
+        return "";
     }
 
     /**
@@ -449,7 +449,7 @@
         return function (message, file, line) {
             noOfWinOnError++;
 
-            if (noOfWinOnError == 1 || defaults.logAdditionalErrors) {
+            if (noOfWinOnError === 1 || defaults.logAdditionalErrors) {
                 var log = message + " on [" + file + ":" + line + "]";
 
                 WicketClientSideLogging.errorWithoutStack(log);
@@ -463,7 +463,7 @@
                     /*ignore*/
                 }
             }
-        }
+        };
     }
 
     /**
@@ -507,11 +507,11 @@
         defaults.logLevel = getLogLevelAsNumber(defaults.logLevel);
 
         if (defaults.wrapWindowOnError === true || defaults.replaceWindowOnError === true) {
-            win.onerror = wrappedWindowOnError(win.onerror)
+            win.onerror = wrappedWindowOnError(win.onerror);
         }
 
         if ((defaults.wrapWicketLog === true || defaults.replaceWicketLog === true) && (!Wicket.Log || Wicket.Log.isManipulated !== true)) {
-            Wicket.Log = WrappedWicketLog.override(Wicket.Log)
+            Wicket.Log = WrappedWicketLog.override(Wicket.Log);
         }
 
         if (defaults.collectionType === "timer") {
