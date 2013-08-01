@@ -35,7 +35,7 @@
 
     var logLevelNames = ["off", "error", "warn", "info", "debug", "trace"];
     var logLevels = {
-        /* will be generated form logLevelNames, i.e. something like
+        /* will be generated from logLevelNames, i.e. something like
         LVL_OFF: 0,
         LVL_ERROR: 1,
         LVL_WARN: 2,
