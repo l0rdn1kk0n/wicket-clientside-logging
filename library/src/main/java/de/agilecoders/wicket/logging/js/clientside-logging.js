@@ -151,7 +151,7 @@
                 }
 
                 if (win.console[levelName]) {
-                    win.console[levelName(msg)];
+                    win.console[levelName](msg);
                 }
                 else if (win.console.log) {
                     win.console.log(msg);
