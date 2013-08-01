@@ -32,19 +32,29 @@
         return;
     }
 
+    var logLevelNames = ["off", "error", "warn", "info", "debug", "trace"];
+    var logLevels = {
+        /*
+        LVL_OFF: 0,
+        LVL_ERROR: 1,
+        LVL_WARN: 2,
+        LVL_INFO: 3,
+        LVL_DEBUG: 4,
+        LVL_TRACE: 5
+        */
+    };
+
+    // automatically creates the logLevel constants as denoted above
+    $.each(logLevelNames, function (i, name) {
+        logLevels["LVL_" + name.toUpperCase()] = i;
+    });
+
     /**
      * Base logger class that's responsible to send log messages.
      *
      * @type Object
      */
-    win.WicketClientSideLogging = {
-
-        LVL_OFF: "off",
-        LVL_ERROR: "error",
-        LVL_WARN: "warn",
-        LVL_INFO: "info",
-        LVL_DEBUG: "debug",
-        LVL_TRACE: "trace",
+    var WicketClientSideLogging = {
 
         /**
          * logs an error message
@@ -52,7 +62,7 @@
          * @param message the message to log
          */
         error: function (message) {
-            this.log(this.LVL_ERROR, message, stacktrace());
+            this.log(logLevels.LVL_ERROR, message, stacktrace());
         },
 
         /**
@@ -61,7 +71,7 @@
          * @param message the message to log
          */
         errorWithoutStack: function (message) {
-            this.log(this.LVL_ERROR, message, "");
+            this.log(logLevels.LVL_ERROR, message, "");
         },
 
         /**
@@ -70,7 +80,7 @@
          * @param message the message to log
          */
         warn: function (message) {
-            this.log(this.LVL_WARN, message, "");
+            this.log(logLevels.LVL_WARN, message, "");
         },
 
         /**
@@ -79,7 +89,7 @@
          * @param message the message to log
          */
         info: function (message) {
-            this.log(this.LVL_INFO, message, "");
+            this.log(logLevels.LVL_INFO, message, "");
         },
 
         /**
@@ -88,7 +98,7 @@
          * @param message the message to log
          */
         debug: function (message) {
-            this.log(this.LVL_DEBUG, message, "");
+            this.log(logLevels.LVL_DEBUG, message, "");
         },
 
         /**
@@ -97,20 +107,22 @@
          * @param message the message to log
          */
         trace: function (message) {
-            this.log(this.LVL_TRACE, message, "");
+            this.log(logLevels.LVL_TRACE, message, "");
         },
 
         /**
          * logs a message
          *
-         * @param lvl the log level to use
+         * @param {number} lvl the log level to use
          * @param message the message to log
          * @param stacktrace current stacktrace
          */
         log: function (lvl, message, stacktrace) {
             if (this.isLoggingActive(lvl)) {
+                var logLevelName = logLevelNames[lvl];
+
                 sendMessage({
-                    lvl: lvl,
+                    lvl: logLevelName,
                     stack: stacktrace,
                     msg: message
                 });
@@ -124,20 +136,22 @@
         /**
          * logs a message to console if available
          *
-         * @param lvl the log level to use
+         * @param {number} lvl the log level to use
          * @param message the message to log
          * @param stacktrace current stacktrace
          */
         consoleLog: function (lvl, message, stacktrace) {
+            var levelName = logLevelNames[lvl];
+
             if (win.console) {
-                var msg = "[" + lvl + "] " + message;
+                var msg = "[" + levelName + "] " + message;
 
                 if (stacktrace && stacktrace != "") {
                     msg += "\n" + stacktrace;
                 }
 
-                if (win.console[lvl]) {
-                    win.console[lvl(msg)];
+                if (win.console[levelName]) {
+                    win.console[levelName(msg)];
                 }
                 else if (win.console.log) {
                     win.console.log(msg);
@@ -149,13 +163,17 @@
          * checks whether logging is active for given log level
          * or not.
          *
-         * @param lvl the log level to check
+         * @param {number} lvl the log level to check
          * @returns {boolean} TRUE, if logging is active for given log level
          */
         isLoggingActive: function (lvl) {
-            return logLevel > 0 && toInt(lvl) <= logLevel;
+            return logLevel > 0 && lvl <= logLevel;
         }
     };
+
+    // merge log levels to WicketClientSideLogging so they are available
+    // via WicketClientSideLogging.LVL_ERROR etc.
+    $.extend(WicketClientSideLogging, logLevels);
 
     var logLevel = 0;
     var queue = [];
@@ -178,33 +196,6 @@
         collectionTimer: 5000,
         collectionType: "single"  // single, timer, size, unload, localstorage
     };
-
-    /**
-     * transforms a log level to its integer representation. The
-     * integer representation of a log level is strictly ordered, which
-     * means that trace has a higher value than error.
-     *
-     * @param lvl the log level to transform
-     * @returns {number} integer representation of given log level
-     */
-    function toInt(lvl) {
-        switch (lvl) {
-            case win.WicketClientSideLogging.LVL_OFF:
-                return 0;
-            case win.WicketClientSideLogging.LVL_ERROR:
-                return 1;
-            case win.WicketClientSideLogging.LVL_WARN:
-                return 2;
-            case win.WicketClientSideLogging.LVL_INFO:
-                return 3;
-            case win.WicketClientSideLogging.LVL_DEBUG:
-                return 4;
-            case win.WicketClientSideLogging.LVL_TRACE:
-                return 5;
-        }
-
-        return 0;
-    }
 
     /**
      * sends given data to backend according to the current collection
@@ -261,7 +252,7 @@
             if (currentValue && currentValue.length > 0) {
                 sendQueue(currentValue, async);
                 
-                // empty queue
+                // clear queue, i.e. remove from localStorage
                 amplify.store("clientside-logging", null);
             }
         }
@@ -287,6 +278,7 @@
         var data = appendClientInfo({}), i = 1;
 
         while (q.length > 0) {
+            // removes the item from the queue
             var e = q.pop();
 
             data["timestamp_" + i] = e.timestamp;
@@ -358,7 +350,7 @@
         },
 
         info: function (msg) {
-            win.WicketClientSideLogging.info(msg);
+            WicketClientSideLogging.info(msg);
 
             if (defaults.wrapWicketLog === true && this.origWicketLog) {
                 this.origWicketLog.info(msg);
@@ -366,7 +358,7 @@
         },
 
         error: function (msg) {
-            win.WicketClientSideLogging.error(msg);
+            WicketClientSideLogging.error(msg);
 
             if (defaults.wrapWicketLog === true && this.origWicketLog) {
                 this.origWicketLog.error(msg);
@@ -374,7 +366,7 @@
         },
 
         log: function (msg) {
-            win.WicketClientSideLogging.info(msg);
+            WicketClientSideLogging.info(msg);
 
             if (defaults.wrapWicketLog === true && this.origWicketLog) {
                 this.origWicketLog.log(msg);
@@ -395,7 +387,7 @@
             if (noOfWinOnError == 1 || defaults.logAdditionalErrors) {
                 var log = message + " on [" + file + ":" + line + "]";
 
-                win.WicketClientSideLogging.errorWithoutStack(log);
+                WicketClientSideLogging.errorWithoutStack(log);
             }
 
             if (defaults.wrapWindowOnError === true && origWindowOnError) {
@@ -414,7 +406,7 @@
      *
      * @param options these options will override the default options
      */
-    $.wicketClientSideLogging = function (options) {
+    function initializeLogging (options) {
         defaults = $.extend(defaults, options || {});
 
         if (!defaults.url || defaults.url.length == 0) {
@@ -454,9 +446,15 @@
         }
 
         if (defaults.loggerName) {
-            win[defaults.loggerName] = win.WicketClientSideLogging;
-            $[defaults.loggerName] = win.WicketClientSideLogging;
+            win[defaults.loggerName] = WicketClientSideLogging;
+            $[defaults.loggerName] = WicketClientSideLogging;
         }
-    };
+    }
+
+    // make WicketClientSideLogging public via window
+    win.WicketClientSideLogging = WicketClientSideLogging;
+
+    // make WicketClientSideLogging configurable via jQuery
+    $.wicketClientSideLogging = initializeLogging;
 
 }(jQuery, Wicket, amplify, window));
