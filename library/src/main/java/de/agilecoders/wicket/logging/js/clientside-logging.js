@@ -259,18 +259,16 @@
     };
 
     /**
-     * Handles an invalid collection type
-     *
-     * TODO: What happens if an error is thrown in window.onerror? Endless loop maybe?
+     * Returns an error message for an invalid collection type.
      */
-    function handleInvalidCollectionType(type) {
+    function getInvalidCollectionTypeMessage(type) {
         var keys = [], key;
 
         for (key in collectionTypes) {
             keys.push(key);
         }
 
-        throw new Error("invalid collection type: " + type + "; must be one of: [" + keys.join(", ") + "]");
+        return "Invalid collection type: " + type + "; must be one of: [" + keys.join(", ") + "]";
     }
 
     /**
@@ -289,9 +287,6 @@
 
         if (collectionTypes.hasOwnProperty(type)) {
             collectionTypes[type]();
-        }
-        else {
-            handleInvalidCollectionType(type);
         }
     }
 
@@ -503,6 +498,10 @@
         if (!defaults.url) {
             throw new Error("there's no valid url set: " + defaults.url);
         }
+        
+        if (!collectionTypes.hasOwnProperty(defaults.collectionType)) {
+            throw new Error(getInvalidCollectionTypeMessage(defaults.collectionType));
+        }
 
         defaults.logLevel = getLogLevelAsNumber(defaults.logLevel);
 
@@ -513,7 +512,7 @@
         if ((defaults.wrapWicketLog === true || defaults.replaceWicketLog === true) && (!Wicket.Log || Wicket.Log.isManipulated !== true)) {
             Wicket.Log = WrappedWicketLog.override(Wicket.Log);
         }
-
+        
         if (defaults.collectionType === "timer") {
             win.setInterval(function () {
                 flushMessages(true);
