@@ -34,7 +34,7 @@
 
     var logLevelNames = ["off", "error", "warn", "info", "debug", "trace"];
     var logLevels = {
-        /*
+        /* will be generated form logLevelNames, i.e. something like
         LVL_OFF: 0,
         LVL_ERROR: 1,
         LVL_WARN: 2,
@@ -44,7 +44,7 @@
         */
     };
 
-    // automatically creates the logLevel constants as denoted above
+    // automatically generates the logLevel constants as denoted above
     $.each(logLevelNames, function (i, name) {
         logLevels["LVL_" + name.toUpperCase()] = i;
     });
@@ -151,7 +151,7 @@
                 }
 
                 if (win.console[levelName]) {
-                    win.console[levelName](msg);
+                    win.console[levelName(msg)];
                 }
                 else if (win.console.log) {
                     win.console.log(msg);
@@ -167,7 +167,7 @@
          * @returns {boolean} TRUE, if logging is active for given log level
          */
         isLoggingActive: function (lvl) {
-            return logLevel > 0 && lvl <= logLevel;
+            return defaults.logLevel > 0 && defaults.logLevel >= lvl;
         }
     };
 
@@ -175,7 +175,67 @@
     // via WicketClientSideLogging.LVL_ERROR etc.
     $.extend(WicketClientSideLogging, logLevels);
 
-    var logLevel = 0;
+    /**
+     * There are several ways of how to send the messages to the backend.
+     *
+     * These methods define how a single message (given via a data object) is handled.
+     */
+    var collectionTypes = {
+        /*
+         * Each message will be sent to the backend directly
+         *
+         * @param {Object} data The log data to send to backend
+         */
+        "single": function (data) {
+            sendQueue([data], true);
+        },
+
+        /*
+         * After a configurable (defaults.collectionTimer) amount of time all queued messages will be sent to backend
+         *
+         * @param {Object} data The log data to send to backend
+         */
+        "timer": function (data) {
+            queue.push(data);
+        },
+
+        /*
+         * After a configurable (defaults.maxQueueSize) size of queue all queued messages will be sent to backend
+         *
+         * @param {Object} data The log data to send to backend
+         */
+        "size": function (data) {
+            queue.push(data);
+
+            if (queue.length >= defaults.maxQueueSize) {
+                flushMessages(true);
+            }
+        },
+
+        /*
+         * Messages will be queued and sent to the backend on page unload
+         *
+         * @param {Object} data The log data to send to backend
+         */
+        "unload": function (data) {
+            queue.push(data);
+        },
+
+        /*
+         * Messages will be collected in localStorage and sent to the backend on next page load
+         */
+        "localstorage": function (data) {
+            var currentValue = amplify.store("clientside-logging");
+
+            if (!currentValue) {
+                currentValue = [];
+            }
+
+            currentValue.push(data);
+            amplify.store("clientside-logging", currentValue);
+        }
+    };
+
     var queue = [];
     var noOfWinOnError = 0;
     var defaults = {
@@ -187,7 +247,7 @@
         logStacktrace: false,
         logAdditionalErrors: true,
         collectClientInfos: true,
-        logLevel: win.WicketClientSideLogging.LVL_ERROR,
+        logLevel: WicketClientSideLogging.LVL_ERROR,
         url: null,
         method: 'POST',
         maxQueueSize: 10,
@@ -198,45 +258,39 @@
     };
 
     /**
+     * Handles an invalid collection type
+     *
+     * TODO: What happens if an error is thrown in window.onerror? Endless loop maybe?
+     */
+    function handleInvalidCollectionType(type) {
+        var keys = [], key;
+
+        for (key in collectionTypes) {
+            keys.push(key);
+        }
+
+        throw new Error("invalid collection type: " + type + "; must be one of: [" + keys.join(", ") + "]");
+    }
+
+    /**
      * sends given data to backend according to the current collection
      * type.
      *
-     *  - single: each message will be sent to the backend directly
-     *  - timer: after a configurable (defaults.collectionTimer) amount of time all queued messages will be sent to backend
-     *  - size: after a configurable (defaults.maxQueueSize) size of queue all queued messages will be sent to backend
-     *  - unload: messages will be queued and sent to the backend on page unload
-     *  - localstorage: messages will be collected in localStorage and sent to the backend on next page load
+     * For information on the available collection types turn to the documentation
+     * on the collectionTypes object.
      *
      * @param data the log data to send to backend
      */
     function sendMessage(data) {
+        var type = defaults.collectionType;
+
         data.timestamp = (new Date()).toUTCString();
 
-        if (defaults.collectionType === "single") {
-            sendQueue([data], true);
-        }
-        else if (defaults.collectionType === "localstorage") {
-            var currentValue = amplify.store("clientside-logging");
-
-            if (!currentValue) {
-                currentValue = [];
-            }
-
-            currentValue.push(data);
-            amplify.store("clientside-logging", currentValue);
-        }
-        else if (defaults.collectionType === "timer" || defaults.collectionType === "unload") {
-            queue.push(data);
-        }
-        else if (defaults.collectionType === "size") {
-            queue.push(data);
-
-            if (queue.length >= defaults.maxQueueSize) {
-                flushMessages(true);
-            }
+        if (collectionTypes.hasOwnProperty(type)) {
+            collectionTypes[type]();
         }
         else {
-            throw new Error("invalid collection type: " + defaults.collectionType + "; must be one of: [single, timer, size, unload, localstorage]");
+            handleInvalidCollectionType(type);
         }
     }
 
@@ -251,7 +305,7 @@
 
             if (currentValue && currentValue.length > 0) {
                 sendQueue(currentValue, async);
-                
+
                 // clear queue, i.e. remove from localStorage
                 amplify.store("clientside-logging", null);
             }
@@ -262,19 +316,13 @@
     }
 
     /**
-     * executes the ajax call
+     * Processes the queue to a flat object that contains all data that should
+     * be sent to the backend.
      *
-     * @param q an array of log messages
-     * @param async whether to send messages asynchronously or not
+     * @param {Array} queue
+     * @return {Object}
      */
-    function sendQueue(q, async) {
-        if (!q || q.length <= 0) {
-            return;
-        }
-
-        // default mode is async
-        async = async !== false;
-
+    function prepareData(queue) {
         var data = appendClientInfo({}), i = 1;
 
         while (q.length > 0) {
@@ -292,12 +340,29 @@
             i++;
         }
 
+        return data;
+    }
+
+    /**
+     * executes the ajax call
+     *
+     * @param q an array of log messages
+     * @param async whether to send messages asynchronously or not
+     */
+    function sendQueue(q, async) {
+        if (!q || q.length <= 0) {
+            return;
+        }
+
+        // default mode is async
+        async = async !== false;
+
         $.ajax({
             type: defaults.method,
             url: defaults.url,
             cache: false,
             async: async,
-            data: data
+            data: prepareData(q);
         });
     }
 
@@ -402,18 +467,44 @@
     }
 
     /**
-     * jquery plugin definition
+     * Converts the given log level to a number. Defaults to logLevels.LVL_ERROR.
      *
-     * @param options these options will override the default options
+     * @param {*} Some representation of a level, either a number or a string
+     *          like "error" or "warn" or anything else.
+     * @return {number}
+     */
+    function getLogLevelAsNumber(level) {
+        // convert "error", "warn" etc.
+        if (typeof level === "string") {
+            var key = "LVL_" + level.toUpperCase();
+
+            if (logLevels.hasOwnProperty(key)) {
+                level = logLevels[key];
+            }
+        }
+
+        // convert any other non-number value to logLevels.LVL_ERROR
+        if (typeof level !== "number") {
+            level = logLevels.LVL_ERROR;
+        }
+
+        // limit level to a reasonable value, i.e. a non-negative integer 
+        return Math.max(0, Math.floor(level));
+    }
+
+    /**
+     * Initializes the logging.
+     *
+     * @param {Object} options these options will override the default options
      */
     function initializeLogging (options) {
-        defaults = $.extend(defaults, options || {});
+        $.extend(defaults, options || {});
 
-        if (!defaults.url || defaults.url.length == 0) {
+        if (!defaults.url) {
             throw new Error("there's no valid url set: " + defaults.url);
         }
 
-        logLevel = toInt(defaults.logLevel);
+        defaults.logLevel = getLogLevelAsNumber(defaults.logLevel);
 
         if (defaults.wrapWindowOnError === true || defaults.replaceWindowOnError === true) {
             win.onerror = wrappedWindowOnError(win.onerror)
@@ -450,6 +541,9 @@
             $[defaults.loggerName] = WicketClientSideLogging;
         }
     }
+
+    // allow configuration via WicketClientSideLogging
+    WicketClientSideLogging.initialize = initializeLogging;
 
     // make WicketClientSideLogging public via window
     win.WicketClientSideLogging = WicketClientSideLogging;
