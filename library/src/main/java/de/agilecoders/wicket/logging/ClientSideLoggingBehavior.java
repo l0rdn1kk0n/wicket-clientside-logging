@@ -1,13 +1,17 @@
 package de.agilecoders.wicket.logging;
 
 import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
+import org.apache.wicket.Application;
 import org.apache.wicket.Component;
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.ajax.WicketAjaxJQueryResourceReference;
 import org.apache.wicket.ajax.json.JSONException;
 import org.apache.wicket.ajax.json.JSONObject;
 import org.apache.wicket.behavior.Behavior;
+import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.AbstractResource;
@@ -244,6 +248,13 @@ public class ClientSideLoggingBehavior extends Behavior {
     public void renderHead(Component component, IHeaderResponse response) {
         final ClientSideLoggingSettings settings = settings();
 
+        response.render(JavaScriptHeaderItem.forReference(Application.get().getJavaScriptLibrarySettings().getJQueryReference()));
+        response.render(JavaScriptHeaderItem.forReference(WicketAjaxJQueryResourceReference.get()));
+
+        if (ClientSideLoggingSettings.get().logStacktrace()) {
+            response.render(JavaScriptHeaderItem.forReference(new WebjarsJavaScriptResourceReference("stacktrace/current/stacktrace.js")));
+        }
+
         /**
          * amplify js is used as wrapper for localStorage because each browser comes with its own implementation
          */
@@ -252,7 +263,18 @@ public class ClientSideLoggingBehavior extends Behavior {
         }
 
         response.render(settings.javaScriptHeaderItem());
-        response.render(JavaScriptHeaderItem.forScript(createInitializerScript(data), settings.id()));
+        response.render(newHeaderItem(createInitializerScript(data), settings.id()));
+    }
+
+    /**
+     * creates a new header item for the initializer script
+     *
+     * @param script the script to render
+     * @param id the js id that can be used when rendering this script
+     * @return new header item
+     */
+    protected HeaderItem newHeaderItem(final CharSequence script, final String id) {
+        return OnDomReadyHeaderItem.forScript(script);
     }
 
     /**
@@ -263,7 +285,7 @@ public class ClientSideLoggingBehavior extends Behavior {
      */
     protected CharSequence createInitializerScript(final Map<String, Object> data) {
         try {
-            return "$.wicketClientSideLogging(" + JSONObject.valueToString(data) + ");";
+            return "window.wicketClientSideLogging(jQuery, Wicket, window.amplify, " + JSONObject.valueToString(data) + ");";
         } catch (JSONException e) {
             throw new WicketRuntimeException(e);
         }

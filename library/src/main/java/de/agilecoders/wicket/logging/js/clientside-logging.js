@@ -26,29 +26,38 @@
  * @author miha
  */
 ;
-(function ($, Wicket, amplify, win) {
+(function (win) {
     'use strict';
 
     if (typeof win.WicketClientSideLogging === 'object') {
         return;
     }
 
+    var $, Wicket, amplify;
+
+    // cache window onerror calls before this plugin is initialized
+    var cachedErrors = [];
+    var cachedOrigWinOnError = win.onerror;
+    win.onerror = function (message, file, line) {
+        cachedErrors.push({
+            message: message,
+            file: file,
+            line: line,
+            timestamp: currentTimestamp()
+        });
+    };
+
     var logLevelNames = ["off", "error", "warn", "info", "debug", "trace"];
     var logLevels = {
         /* will be generated from logLevelNames, i.e. something like
-        LVL_OFF: 0,
-        LVL_ERROR: 1,
-        LVL_WARN: 2,
-        LVL_INFO: 3,
-        LVL_DEBUG: 4,
-        LVL_TRACE: 5
-        */
+         LVL_OFF: 0,
+         LVL_ERROR: 1,
+         LVL_WARN: 2,
+         LVL_INFO: 3,
+         LVL_DEBUG: 4,
+         LVL_TRACE: 5
+         */
     };
-
-    // automatically generates the logLevel constants as denoted above
-    $.each(logLevelNames, function (i, name) {
-        logLevels["LVL_" + name.toUpperCase()] = i;
-    });
 
     /**
      * Base logger class that's responsible to send log messages.
@@ -172,10 +181,6 @@
         }
     };
 
-    // merge log levels to WicketClientSideLogging so they are available
-    // via WicketClientSideLogging.LVL_ERROR etc.
-    $.extend(WicketClientSideLogging, logLevels);
-
     /**
      * There are several ways of how to send the messages to the backend.
      *
@@ -272,6 +277,13 @@
     }
 
     /**
+     * @returns {string} current timestamp as utc string
+     */
+    function currentTimestamp() {
+        return (new Date()).toUTCString();
+    }
+
+    /**
      * sends given data to backend according to the current collection
      * type.
      *
@@ -283,7 +295,7 @@
     function sendMessage(data) {
         var type = defaults.collectionType;
 
-        data.timestamp = (new Date()).toUTCString();
+        data.timestamp = currentTimestamp();
 
         if (collectionTypes.hasOwnProperty(type)) {
             collectionTypes[type]();
@@ -490,29 +502,56 @@
     /**
      * Initializes the logging.
      *
+     * @param {Object} jquery instance
+     * @param {Object} W the wicket object
+     * @param {Object} amp amplify object
      * @param {Object} options these options will override the default options
      */
-    function initializeLogging (options) {
+    function initializeLogging(jQuery, W, amp, options) {
+        $ = jQuery;
+        Wicket = W;
+        amplify = amp;
+
+        // automatically generates the logLevel constants as denoted above
+        $.each(logLevelNames, function (i, name) {
+            logLevels["LVL_" + name.toUpperCase()] = i;
+        });
+
+        // merge log levels to WicketClientSideLogging so they are available
+        // via WicketClientSideLogging.LVL_ERROR etc.
+        $.extend(WicketClientSideLogging, logLevels);
+
         $.extend(defaults, options || {});
 
         if (!defaults.url) {
             throw new Error("there's no valid url set: " + defaults.url);
         }
-        
+
         if (!collectionTypes.hasOwnProperty(defaults.collectionType)) {
             throw new Error(getInvalidCollectionTypeMessage(defaults.collectionType));
         }
 
         defaults.logLevel = getLogLevelAsNumber(defaults.logLevel);
 
+        win.onerror = cachedOrigWinOnError;
+
         if (defaults.wrapWindowOnError === true || defaults.replaceWindowOnError === true) {
             win.onerror = wrappedWindowOnError(win.onerror);
+
+            while (cachedErrors && cachedErrors.length > 0) {
+                // removes the item from the queue
+                var e = cachedErrors.pop();
+
+                win.onerror(e.message, e.file, e.line);
+            }
+        } else {
+            cachedErrors = [];
         }
 
         if ((defaults.wrapWicketLog === true || defaults.replaceWicketLog === true) && (!Wicket.Log || Wicket.Log.isManipulated !== true)) {
             Wicket.Log = WrappedWicketLog.override(Wicket.Log);
         }
-        
+
         if (defaults.collectionType === "timer") {
             win.setInterval(function () {
                 flushMessages(true);
@@ -520,6 +559,10 @@
         }
 
         if (defaults.collectionType === "localstorage") {
+            if (!amplify) {
+                throw new Error("can't use collection type 'localeStorage' without amplify.");
+            }
+
             $(win).load(function () {
                 win.setTimeout(function () {
                     flushMessages(true);
@@ -547,7 +590,7 @@
     // make WicketClientSideLogging public via window
     win.WicketClientSideLogging = WicketClientSideLogging;
 
-    // make WicketClientSideLogging configurable via jQuery
-    $.wicketClientSideLogging = initializeLogging;
+    // make WicketClientSideLogging configurable
+    win.wicketClientSideLogging = initializeLogging;
 
-}(jQuery, Wicket, amplify, window));
+}(window));

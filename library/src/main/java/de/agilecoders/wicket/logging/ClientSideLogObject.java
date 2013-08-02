@@ -23,7 +23,7 @@ public class ClientSideLogObject {
      * @param message    the message as {@link StringValue}
      * @param timestamp  the timestamp as {@link StringValue} in UTC format.
      * @param stacktrace the client side stacktrace
-     * @param index      the param index
+     * @param index      the parameter index that was used on client side to generate this log object
      */
     public ClientSideLogObject(String lvl, String message, String timestamp, String stacktrace, int index) {
         this(StringValue.valueOf(lvl), StringValue.valueOf(message), StringValue.valueOf(timestamp), StringValue.valueOf(stacktrace), index);

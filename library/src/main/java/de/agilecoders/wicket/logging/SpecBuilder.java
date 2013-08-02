@@ -13,8 +13,8 @@ import java.util.Map;
 /**
  * A specification of a {@link ClientSideLoggingBehavior.Builder} configuration.
  * <p/>
- * <p>{@code SpecBuilder} supports parsing configuration off of a string, which
- * makes it especially useful for command-line configuration of a {@code ClientSideLoggingBehavior.Builder}.
+ * <p>{@code SpecBuilder} supports parsing a string configuration, which
+ * is useful for command-line configuration of a {@code ClientSideLoggingBehavior.Builder}.
  * <p/>
  * <p>The string syntax is a series of comma-separated keys or key-value pairs,
  * each corresponding to a {@code ClientSideLoggingBehavior.Builder} method.
