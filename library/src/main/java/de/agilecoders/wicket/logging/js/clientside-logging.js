@@ -298,7 +298,7 @@
         data.timestamp = currentTimestamp();
 
         if (collectionTypes.hasOwnProperty(type)) {
-            collectionTypes[type]();
+            collectionTypes[type](data);
         }
     }
 
