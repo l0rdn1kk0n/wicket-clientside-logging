@@ -12,10 +12,7 @@ import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
-import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.request.resource.AbstractResource;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.time.Duration;
 
@@ -295,52 +292,7 @@ public class ClientSideLoggingBehavior extends Behavior {
      * @return callback url that is used as client side logging entry
      */
     protected CharSequence createCallbackUrl() {
-        return RequestCycle.get().urlFor(new ClientSideErrorLoggingRR(), null);
+        return RequestCycle.get().urlFor(new ClientSideErrorLoggingResourceReference(), null);
     }
 
-    /**
-     * The resource reference that represents the entry point on server side
-     * for client side logging.
-     */
-    private static final class ClientSideErrorLoggingRR extends ResourceReference {
-
-        /**
-         * Construct.
-         */
-        public ClientSideErrorLoggingRR() {
-            super(new Key(ClientSideLoggingBehavior.class.getName(), ClientSideLoggingSettings.get().id(), null, null, null));
-        }
-
-        @Override
-        public org.apache.wicket.request.resource.IResource getResource() {
-            return new ClientSideErrorLoggingResource();
-        }
-    }
-
-    /**
-     * The resource that is executed when an incoming log request needs to be handled.
-     */
-    private static final class ClientSideErrorLoggingResource extends AbstractResource {
-
-        @Override
-        protected org.apache.wicket.request.resource.AbstractResource.ResourceResponse newResourceResponse(Attributes attributes) {
-            writeToLog(attributes);
-
-            return new EmptyResourceResponse();
-        }
-
-        /**
-         * writes all log messages to the log store
-         *
-         * @param attributes response attributes
-         */
-        private void writeToLog(Attributes attributes) {
-            final IRequestParameters params = attributes.getRequest().getPostParameters();
-            final IParamValueExtractor.Result result = settings().paramValueExtractor().parse(params);
-
-            settings().logger().log(result.logObjects(), result.clientInfos());
-        }
-
-
-    }
 }
