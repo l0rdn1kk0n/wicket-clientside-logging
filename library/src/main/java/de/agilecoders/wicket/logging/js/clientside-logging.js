@@ -370,6 +370,7 @@
             url: defaults.url,
             cache: false,
             async: async,
+            dataType: "text",
             data: prepareData(q)
         });
     }

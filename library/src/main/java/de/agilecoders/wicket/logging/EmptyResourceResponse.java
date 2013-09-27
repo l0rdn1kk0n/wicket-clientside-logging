@@ -31,6 +31,7 @@ public class EmptyResourceResponse extends AbstractResource.ResourceResponse {
         disableCaching();
         setStatusCode(statusCode);
         setContentLength(0);
+        setContentType("text/plain");
         setWriteCallback(newWriteCallback());
     }
 
