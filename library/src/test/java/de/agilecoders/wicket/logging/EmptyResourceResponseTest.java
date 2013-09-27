@@ -48,6 +48,13 @@ public class EmptyResourceResponseTest {
     }
 
     @Test
+    public void defaultContentTypeIsText() {
+        EmptyResourceResponse response = new EmptyResourceResponse();
+
+        assertThat(response.getContentType(), is(equalTo("text/plain")));
+    }
+
+    @Test
     public void defaultStatusCodeIs200() {
         EmptyResourceResponse response = new EmptyResourceResponse();
 
