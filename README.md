@@ -19,7 +19,7 @@ core maven dependency:
 <dependency>
   <groupId>de.agilecoders.wicket</groupId>
   <artifactId>wicket-clientside-logging</artifactId>
-  <version>0.1.6</version>
+  <version>0.1.8</version>
 </dependency>
 ```
 
