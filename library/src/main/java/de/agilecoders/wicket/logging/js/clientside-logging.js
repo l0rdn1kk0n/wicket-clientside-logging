@@ -130,12 +130,24 @@
         log: function (lvl, message, stacktrace) {
             if (this.isLoggingActive(lvl)) {
                 var logLevelName = logLevelNames[lvl];
-
-                sendMessage({
+                var log = {
                     lvl: logLevelName,
-                    stack: stacktrace,
-                    msg: message
-                });
+                    stack: stacktrace
+                };
+
+                if (typeof message === "string") {
+                    log.msg = message;
+                }
+                else if (typeof message === "object") {
+                    log.msg = message.message;
+                    log.file = message.file;
+                    log.line = message.line;
+                }
+                else {
+                    log.message = message + "";
+                }
+
+                sendMessage(log);
             }
 
             if (defaults.debug === true) {
@@ -154,7 +166,7 @@
             var levelName = logLevelNames[lvl];
 
             if (win.console) {
-                var msg = "[" + levelName + "] " + message;
+                var msg = "[" + levelName + "] " + this.messageToString(message);
 
                 if (stacktrace) {
                     msg += "\n" + stacktrace;
@@ -166,6 +178,21 @@
                 else if (win.console.log) {
                     win.console.log(msg);
                 }
+            }
+        },
+
+        /**
+         * transforms given message into a string
+         *
+         * @param {string|object} message
+         * @returns {string}
+         */
+        messageToString: function (message) {
+            if (typeof message === "object") {
+                return message.message + " on [" + message.file + ":" + message.line + "]"
+            }
+            else {
+                return message + "";
             }
         },
 
@@ -185,6 +212,8 @@
      * There are several ways of how to send the messages to the backend.
      *
      * These methods define how a single message (given via a data object) is handled.
+     *
+     * @Type Object
      */
     var collectionTypes = {
         /*
@@ -258,6 +287,7 @@
         method: 'POST',
         maxQueueSize: 10,
         loggerName: "Log",
+        customFilter: null,
         debug: false,
         collectionTimer: 5000,
         collectionType: "single"  // single, timer, size, unload, localstorage
@@ -337,15 +367,24 @@
             // removes the item from the queue
             var e = queue.pop();
 
-            data["timestamp_" + i] = e.timestamp;
-            data["msg_" + i] = e.msg;
-            data["lvl_" + i] = e.lvl;
+            if (filter(e)) {
+                data["timestamp_" + i] = e.timestamp;
+                data["msg_" + i] = e.msg;
+                data["lvl_" + i] = e.lvl;
 
-            if (defaults.logStacktrace && e.stack) {
-                data["stack_" + i] = e.stack;
+                if (e.line) {
+                    data["line_" + i] = e.line;
+                }
+                if (e.file) {
+                    data["file_" + i] = e.file;
+                }
+
+                if (defaults.logStacktrace && e.stack) {
+                    data["stack_" + i] = e.stack;
+                }
+
+                i++;
             }
-
-            i++;
         }
 
         return data;
@@ -362,6 +401,11 @@
             return;
         }
 
+        var data = prepareData(q);
+        if (!data || data.length <= 0) {
+            return;
+        }
+
         // default mode is async
         async = async !== false;
 
@@ -371,8 +415,18 @@
             cache: false,
             async: async,
             dataType: "text",
-            data: prepareData(q)
+            data: data
         });
+    }
+
+    /**
+     * filters out an event object
+     *
+     * @param event {Object} the event to filter
+     * @returns {boolean} whether to accept event or not (TRUE=send event to server, FALSE=skip)
+     */
+    function filter(event) {
+        return event != null && typeof defaults.customFilter === "function" && defaults.customFilter(event);
     }
 
     /**
@@ -458,9 +512,11 @@
             noOfWinOnError++;
 
             if (noOfWinOnError === 1 || defaults.logAdditionalErrors) {
-                var log = message + " on [" + file + ":" + line + "]";
-
-                WicketClientSideLogging.errorWithoutStack(log);
+                WicketClientSideLogging.errorWithoutStack({
+                    message: message,
+                    file: file,
+                    line: line
+                });
             }
 
             if (defaults.wrapWindowOnError === true && origWindowOnError) {
@@ -477,8 +533,8 @@
     /**
      * Converts the given log level to a number. Defaults to logLevels.LVL_ERROR.
      *
-     * @param {*} Some representation of a level, either a number or a string
-     *          like "error" or "warn" or anything else.
+     * @param {string|number} level Some representation of a level, either a number or a string like "error"
+     *                              or "warn" or anything else.
      * @return {number}
      */
     function getLogLevelAsNumber(level) {
@@ -501,9 +557,32 @@
     }
 
     /**
+     * transforms a function name into the function instance
+     *
+     * @param {String} functionName the function name to transform into its instance
+     * @returns {Function} the function instance
+     */
+    function toFunction(functionName) {
+        if (functionName.indexOf(".") > -1) {
+            var parts = functionName.split(".");
+            for (var i = 0, len = parts.length, obj = window; i < len; ++i) {
+                if (obj[parts[i]]) {
+                    obj = obj[parts[i]];
+                } else {
+                    return null;
+                }
+            }
+            return typeof obj === "function" ? obj : null;
+        } else if (typeof window[functionName] === "function") {
+            return window[functionName];
+        }
+        return null;
+    }
+
+    /**
      * Initializes the logging.
      *
-     * @param {Object} jquery instance
+     * @param {Object} jQuery instance
      * @param {Object} W the wicket object
      * @param {Object} amp amplify object
      * @param {Object} options these options will override the default options
@@ -523,6 +602,17 @@
         $.extend(WicketClientSideLogging, logLevels);
 
         $.extend(defaults, options || {});
+
+        if (typeof defaults.customFilter === "function") {
+            // everything ok.
+        } else if(typeof defaults.customFilter === "string" && defaults.customFilter.indexOf("return") == 0) {
+            defaults.customFilter = new Function("event", defaults.customFilter);
+        } else if(typeof defaults.customFilter === "string") {
+            defaults.customFilter = toFunction(defaults.customFilter);
+        } else {
+            // invalid custom filter, remove it.
+            defaults.customFilter = null;
+        }
 
         if (!defaults.url) {
             throw new Error("there's no valid url set: " + defaults.url);
@@ -545,7 +635,8 @@
 
                 win.onerror(e.message, e.file, e.line);
             }
-        } else {
+        }
+        else {
             cachedErrors = [];
         }
 
@@ -594,4 +685,33 @@
     // make WicketClientSideLogging configurable
     win.wicketClientSideLogging = initializeLogging;
 
+    /**
+     * Copyright (c) Mozilla Foundation http://www.mozilla.org/
+     * This code is available under the terms of the MIT License
+     *
+     * if there's no filter method on Array: add it
+     */
+    function addFilterPrototype() {
+        if (!Array.prototype.filter) {
+            Array.prototype.filter = function (fun /*, thisp*/) {
+                var len = this.length >>> 0;
+                if (typeof fun != "function") {
+                    throw new TypeError();
+                }
+
+                var res = [];
+                var thisp = arguments[1];
+                for (var i = 0; i < len; i++) {
+                    if (i in this) {
+                        var val = this[i]; // in case fun mutates this
+                        if (fun.call(thisp, val, i, this)) {
+                            res.push(val);
+                        }
+                    }
+                }
+
+                return res;
+            };
+        }
+    }
 }(window));

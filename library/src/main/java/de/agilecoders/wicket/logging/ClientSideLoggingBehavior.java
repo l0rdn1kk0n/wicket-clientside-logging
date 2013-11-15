@@ -185,6 +185,16 @@ public class ClientSideLoggingBehavior extends Behavior {
             return this;
         }
 
+        public Builder customFilter(final String value) {
+            data.put("customFilter", value);
+
+            if (value == null) {
+                data.remove("customFilter");
+            }
+
+            return this;
+        }
+
         /**
          * @return copy of builder data
          */

@@ -44,6 +44,8 @@ public interface IParamValueExtractor {
                     case ParamNames.TIMESTAMP:
                     case ParamNames.LEVEL:
                     case ParamNames.MESSAGE:
+                    case ParamNames.FILE:
+                    case ParamNames.LINE:
                     case ParamNames.STACKTRACE:
                         final int index = extractIndex(paramName);
 
@@ -51,6 +53,8 @@ public interface IParamValueExtractor {
                             ClientSideLogObject obj = new ClientSideLogObject(params.getParameterValue(ParamNames.LEVEL + DefaultValues.paramSplitter + index),
                                                                               params.getParameterValue(ParamNames.MESSAGE + DefaultValues.paramSplitter + index),
                                                                               params.getParameterValue(ParamNames.TIMESTAMP + DefaultValues.paramSplitter + index),
+                                                                              params.getParameterValue(ParamNames.FILE + DefaultValues.paramSplitter + index),
+                                                                              params.getParameterValue(ParamNames.LINE + DefaultValues.paramSplitter + index),
                                                                               params.getParameterValue(ParamNames.STACKTRACE + DefaultValues.paramSplitter + index),
                                                                               index);
 

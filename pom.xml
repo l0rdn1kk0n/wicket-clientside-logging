@@ -64,12 +64,12 @@
         <mvn.build.java.version>1.7</mvn.build.java.version>
         <mvn.version>3.0.0</mvn.version>
 
-        <wicket.version>6.11.0</wicket.version>
-        <wicket-webjars.version>0.2.0</wicket-webjars.version>
+        <wicket.version>6.12.0</wicket.version>
+        <wicket-webjars.version>0.3.2</wicket-webjars.version>
         <stacktrace-js.version>0.5.0</stacktrace-js.version>
         <amplify-js.version>1.1.0</amplify-js.version>
 
-        <com.google.guava.version>15.0</com.google.guava.version>
+        <com.google.guava.version>14.0.1</com.google.guava.version>
         <junit.version>4.11</junit.version>
         <mockito.version>1.9.5</mockito.version>
         <slf4j.version>1.7.5</slf4j.version>

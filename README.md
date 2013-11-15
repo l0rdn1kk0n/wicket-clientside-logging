@@ -81,6 +81,7 @@ Configuration of ClientSideLoggingBehavior:
 		.collectionTimer(duration)		// Sets the interval between two server calls, all messages between will be queued, this is only used if collectionType is set to "timer" (default: 5000)
 		.maxQueueSize(size)				// Sets the maximum queue size, if max size is exceeded all messages will be sent to server (default: 10)
 		.collectionType(type)			// Sets the collection type (default: single, other: timer, size, unload)
+		.customFilter(string)			// Sets the custom client side filter for log events (see QA: How to add client side filter?)
 		.loggerName(name)				// Sets the logger name that is used on client side, e.g. name="Log": Log.info('message'); (default: Log)
 	.build();
 ```
@@ -124,6 +125,28 @@ public class MyPage extends WebPage {
     super(params);
 
     add(ClientSideLoggingBehavior.newBuilder().build(MyClientSideLoggingBehavior.class));
+  }
+
+  public static class MyClientSideLoggingBehavior extends ClientSideLoggingBehavior {
+    public MyClientSideLoggingBehavior(final Map<String, Object> data) {
+        super(data);
+    }
+  }
+}
+```
+
+#### How to add client side filter?
+
+```java
+public class MyPage extends WebPage {
+  public MyPage(PageParameters params) {
+    super(params);
+
+    add(ClientSideLoggingBehavior.newBuilder()
+            .customFilter("return event.message.indexOf('Error') > -1") // sends all messages that contains "Error" to server
+            .customFilter("globalFilterFunction") // uses the function window.globalFilterFunction(event)
+            .customFilter("my.namespace.filterFunction") // uses the function my.namespace.filterFunction(event)
+            .build(MyClientSideLoggingBehavior.class));
   }
 
   public static class MyClientSideLoggingBehavior extends ClientSideLoggingBehavior {
