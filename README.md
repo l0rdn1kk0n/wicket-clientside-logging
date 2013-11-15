@@ -6,7 +6,7 @@ Current build status: [![Build Status](https://buildhive.cloudbees.com/job/l0rdn
 
 ## Dependencies
 
-* Apache Wicket (6.9.1): http://wicket.apache.org/
+* Apache Wicket (6.12.0): http://wicket.apache.org/
 
 ## Installation
 
