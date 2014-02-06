@@ -1,7 +1,10 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.util.ILoggingBarrier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 
 /**
  * An {@link IClientLogger} is responsible for writing the log messages
@@ -14,16 +17,17 @@ public interface IClientLogger {
     /**
      * writes a set of log messages to the log store
      *
-     * @param logObjects all log messages that needs to be written
+     * @param logObjects  all log messages that needs to be written
      * @param clientInfos the client information according to given logObjects.
      */
-    void log(Iterable<ClientSideLogObject> logObjects, ClientInfos clientInfos);
+    void log(Collection<ClientSideLogObject> logObjects, ClientInfos clientInfos);
 
     /**
      * Default implementation of {@link IClientLogger} that uses slf4j as logger.
      */
     public static class DefaultClientLogger implements IClientLogger {
         private final Logger logger;
+        private final ILoggingBarrier barrier;
 
         /**
          * Construct.
@@ -32,6 +36,7 @@ public interface IClientLogger {
          */
         public DefaultClientLogger(final String id) {
             this.logger = newLogger(id);
+            this.barrier = newBarrier();
         }
 
         /**
@@ -44,38 +49,51 @@ public interface IClientLogger {
             return LoggerFactory.getLogger(loggerName);
         }
 
+        /**
+         * @return new barrier instance
+         */
+        protected ILoggingBarrier newBarrier() {
+            return new ILoggingBarrier.AllowAllBarrier();
+        }
+
         @Override
-        public void log(Iterable<ClientSideLogObject> logObjects, ClientInfos clientInfos) {
+        public void log(Collection<ClientSideLogObject> logObjects, ClientInfos clientInfos) {
+            if(!barrier.isAllowed(logObjects)) {
+                return;
+            }
+
             final ILogCleaner cleaner = ClientSideLoggingSettings.get().cleaner();
 
             for (ClientSideLogObject logObject : logObjects) {
-                switch (logObject.level()) {
-                    case "error":
-                        if (logger.isErrorEnabled()) {
-                            logger.error(newLogMessage("error", logObject, clientInfos, cleaner));
-                        }
-                        break;
-                    case "warn":
-                        if (logger.isWarnEnabled()) {
-                            logger.warn(newLogMessage("warn", logObject, clientInfos, cleaner));
-                        }
-                        break;
-                    case "info":
-                        if (logger.isInfoEnabled()) {
-                            logger.info(newLogMessage("info", logObject, clientInfos, cleaner));
-                        }
-                        break;
-                    case "debug":
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(newLogMessage("debug", logObject, clientInfos, cleaner));
-                        }
-                        break;
-                    case "trace":
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(newLogMessage("trace", logObject, clientInfos, cleaner));
-                        }
-                        break;
-                    default:
+                if (barrier.isAllowed(logObject)) {
+                    switch (logObject.level()) {
+                        case "error":
+                            if (logger.isErrorEnabled()) {
+                                logger.error(newLogMessage("error", logObject, clientInfos, cleaner));
+                            }
+                            break;
+                        case "warn":
+                            if (logger.isWarnEnabled()) {
+                                logger.warn(newLogMessage("warn", logObject, clientInfos, cleaner));
+                            }
+                            break;
+                        case "info":
+                            if (logger.isInfoEnabled()) {
+                                logger.info(newLogMessage("info", logObject, clientInfos, cleaner));
+                            }
+                            break;
+                        case "debug":
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(newLogMessage("debug", logObject, clientInfos, cleaner));
+                            }
+                            break;
+                        case "trace":
+                            if (logger.isTraceEnabled()) {
+                                logger.trace(newLogMessage("trace", logObject, clientInfos, cleaner));
+                            }
+                            break;
+                        default:
+                    }
                 }
             }
         }
@@ -83,10 +101,10 @@ public interface IClientLogger {
         /**
          * creates a new log line
          *
-         * @param logLevel the current log level
-         * @param logObject the log object that contains message and level
+         * @param logLevel    the current log level
+         * @param logObject   the log object that contains message and level
          * @param clientInfos the client information that contains user-agent and ajax base url
-         * @param cleaner the log cleaner implementation
+         * @param cleaner     the log cleaner implementation
          * @return new log message line.
          */
         protected String newLogMessage(String logLevel, ClientSideLogObject logObject, ClientInfos clientInfos, ILogCleaner cleaner) {

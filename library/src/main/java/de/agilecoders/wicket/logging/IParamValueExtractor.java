@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -103,7 +104,7 @@ public interface IParamValueExtractor {
      * result of {@link IParamValueExtractor#parse(org.apache.wicket.request.IRequestParameters)}
      */
     public static final class Result {
-        private final Iterable<ClientSideLogObject> logObjects;
+        private final Set<ClientSideLogObject> logObjects;
         private final ClientInfos clientInfos;
 
         /**
@@ -112,7 +113,7 @@ public interface IParamValueExtractor {
          * @param logObjects  all log messages
          * @param clientInfos the client information
          */
-        public Result(Iterable<ClientSideLogObject> logObjects, ClientInfos clientInfos) {
+        public Result(Set<ClientSideLogObject> logObjects, ClientInfos clientInfos) {
             this.logObjects = logObjects;
             this.clientInfos = clientInfos;
         }
@@ -125,6 +126,6 @@ public interface IParamValueExtractor {
         /**
          * @return all log messages
          */
-        public Iterable<ClientSideLogObject> logObjects() { return logObjects; }
+        public Collection<ClientSideLogObject> logObjects() { return logObjects; }
     }
 }
