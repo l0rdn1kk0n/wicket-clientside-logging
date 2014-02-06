@@ -27,7 +27,7 @@ core maven dependency:
 
 ```java
 // Install settings class; best place to do this is in Application#init()
-ClientSideLoggingSettings.install(Application.get());
+ClientSideLogging.install(Application.get());
 ```
 
 ```java
