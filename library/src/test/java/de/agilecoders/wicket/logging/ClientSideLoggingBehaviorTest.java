@@ -1,5 +1,6 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.util.CollectionType;
 import org.apache.wicket.util.tester.WicketTester;
 import org.apache.wicket.util.time.Duration;
 import org.junit.After;

@@ -1,5 +1,6 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.util.DefaultValues;
 import org.apache.wicket.util.string.StringValue;
 
 /**

@@ -1,6 +1,5 @@
 package de.agilecoders.wicket.logging;
 
-import org.apache.wicket.util.string.StringValue;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -16,13 +15,7 @@ public class ClientSideLogObjectTest {
 
     @Test
     public void valuesCanBeRead() {
-        ClientSideLogObject logObject = new ClientSideLogObject(StringValue.valueOf("error"),
-                                                                StringValue.valueOf("message"),
-                                                                StringValue.valueOf("timestamp"),
-                                                                StringValue.valueOf("file"),
-                                                                StringValue.valueOf("line"),
-                                                                StringValue.valueOf("stacktrace"),
-                                                                0);
+        ClientSideLogObject logObject = Mocks.createClientSideLogObject();
 
         assertThat(logObject.level(), is(equalTo("error")));
         assertThat(logObject.message(), is(equalTo("message")));

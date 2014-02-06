@@ -113,7 +113,7 @@ public class MyApplication extends WebApplication {
         }  
     });
 
-    ClientSideLoggingSettings.install(this, settings);
+    ClientSideLogging.install(this, settings);
   }
 }
 ```

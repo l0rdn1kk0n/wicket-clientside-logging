@@ -1,5 +1,8 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.util.ClientInfos;
+import de.agilecoders.wicket.logging.util.DefaultValues;
+import de.agilecoders.wicket.logging.util.ParamNames;
 import org.apache.wicket.request.IRequestParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

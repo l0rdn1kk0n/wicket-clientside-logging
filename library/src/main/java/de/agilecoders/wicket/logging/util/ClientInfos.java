@@ -1,4 +1,4 @@
-package de.agilecoders.wicket.logging;
+package de.agilecoders.wicket.logging.util;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -1,6 +1,7 @@
 package de.agilecoders.wicket.logging;
 
 import com.google.common.collect.Lists;
+import de.agilecoders.wicket.logging.util.ParamNames;
 import org.apache.wicket.mock.MockRequestParameters;
 import org.apache.wicket.util.time.Time;
 import org.junit.Test;

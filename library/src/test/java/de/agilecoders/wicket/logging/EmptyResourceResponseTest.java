@@ -1,6 +1,7 @@
 package de.agilecoders.wicket.logging;
 
 
+import de.agilecoders.wicket.logging.util.EmptyResourceResponse;
 import org.apache.wicket.mock.MockWebRequest;
 import org.apache.wicket.mock.MockWebResponse;
 import org.apache.wicket.request.Url;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 /**
- * tests the {@link EmptyResourceResponse} class
+ * tests the {@link de.agilecoders.wicket.logging.util.EmptyResourceResponse} class
  *
  * @author miha
  */

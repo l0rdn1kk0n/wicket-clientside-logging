@@ -1,5 +1,7 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.util.ClientInfos;
+import de.agilecoders.wicket.logging.util.ParamNames;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -10,7 +12,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Tests the {@link ClientInfos} class
+ * Tests the {@link de.agilecoders.wicket.logging.util.ClientInfos} class
  *
  * @author miha
  */

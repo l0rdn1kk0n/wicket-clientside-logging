@@ -1,5 +1,6 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.settings.ClientSideLoggingSettings;
 import org.apache.wicket.mock.MockApplication;
 
 /**

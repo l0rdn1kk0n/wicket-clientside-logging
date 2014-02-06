@@ -1,4 +1,4 @@
-package de.agilecoders.wicket.logging;
+package de.agilecoders.wicket.logging.util;
 
 /**
  * Defines all available parameter names.

@@ -1,5 +1,7 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.settings.ClientSideLoggingSettings;
+import de.agilecoders.wicket.logging.util.EmptyResourceResponse;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.IResource;

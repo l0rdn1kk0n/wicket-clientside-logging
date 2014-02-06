@@ -1,5 +1,9 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.settings.ClientSideLoggingSettings;
+import de.agilecoders.wicket.logging.util.CollectionType;
+import de.agilecoders.wicket.logging.util.DefaultValues;
+import de.agilecoders.wicket.logging.util.SpecBuilder;
 import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import org.apache.wicket.Application;
 import org.apache.wicket.Component;

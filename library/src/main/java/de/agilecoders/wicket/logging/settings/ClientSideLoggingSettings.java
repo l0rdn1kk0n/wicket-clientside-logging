@@ -1,10 +1,10 @@
-package de.agilecoders.wicket.logging;
+package de.agilecoders.wicket.logging.settings;
 
-import de.agilecoders.wicket.webjars.util.WicketWebjars;
-import org.apache.wicket.Application;
-import org.apache.wicket.MetaDataKey;
+import de.agilecoders.wicket.logging.ClientSideLoggingJavaScript;
+import de.agilecoders.wicket.logging.IClientLogger;
+import de.agilecoders.wicket.logging.ILogCleaner;
+import de.agilecoders.wicket.logging.IParamValueExtractor;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Args;
 
@@ -13,57 +13,7 @@ import org.apache.wicket.util.lang.Args;
  *
  * @author miha
  */
-public class ClientSideLoggingSettings {
-    /**
-     * The {@link org.apache.wicket.MetaDataKey} used to retrieve the {@link ClientSideLoggingSettings} from the Wicket {@link Appendable}.
-     */
-    private static final MetaDataKey<ClientSideLoggingSettings> ClientSideErrorLoggingSettings_METADATA_KEY = new MetaDataKey<ClientSideLoggingSettings>() {
-    };
-
-    /**
-     * installs default settings on given application
-     *
-     * @param application the application to add the settings to
-     */
-    public static void install(final WebApplication application) {
-        install(application, new ClientSideLoggingSettings());
-    }
-
-    /**
-     * installs given settings on given application
-     *
-     * @param application the application to add the settings to
-     * @param settings    the settings to add
-     */
-    public static void install(final WebApplication application, final ClientSideLoggingSettings settings) {
-        Args.notNull(application, "application").setMetaData(ClientSideErrorLoggingSettings_METADATA_KEY,
-                                                             Args.notNull(settings, "settings"));
-
-        WicketWebjars.install(application);
-    }
-
-    /**
-     * returns the {@link ClientSideLoggingSettings} which are assigned to given application
-     *
-     * @param app The current application
-     * @return assigned {@link ClientSideLoggingSettings}
-     */
-    public static ClientSideLoggingSettings get(final Application app) {
-        return app.getMetaData(ClientSideErrorLoggingSettings_METADATA_KEY);
-    }
-
-    /**
-     * returns the {@link ClientSideLoggingSettings} which are assigned to current application
-     *
-     * @return assigned {@link ClientSideLoggingSettings}
-     */
-    public static ClientSideLoggingSettings get() {
-        if (Application.exists()) {
-            return get(Application.get());
-        }
-
-        throw new IllegalStateException("there is no active application assigned to this thread.");
-    }
+public class ClientSideLoggingSettings implements IClientSideLoggingSettings {
 
     private String id = "client-side-logging";
     private String level = "error";

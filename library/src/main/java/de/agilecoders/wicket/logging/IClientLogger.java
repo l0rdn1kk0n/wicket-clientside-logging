@@ -1,5 +1,7 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.settings.ClientSideLoggingSettings;
+import de.agilecoders.wicket.logging.util.ClientInfos;
 import de.agilecoders.wicket.logging.util.ILoggingBarrier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

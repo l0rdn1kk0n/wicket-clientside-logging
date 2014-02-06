@@ -1,5 +1,6 @@
 package de.agilecoders.wicket.logging;
 
+import de.agilecoders.wicket.logging.util.CollectionType;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -7,7 +8,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Tests the {@link CollectionType} enum
+ * Tests the {@link de.agilecoders.wicket.logging.util.CollectionType} enum
  *
  * @author miha
  */

@@ -1,4 +1,4 @@
-package de.agilecoders.wicket.logging;
+package de.agilecoders.wicket.logging.util;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A specification of a {@link ClientSideLoggingBehavior.Builder} configuration.
+ * A specification of a {@link de.agilecoders.wicket.logging.ClientSideLoggingBehavior.Builder} configuration.
  * <p/>
  * <p>{@code SpecBuilder} supports parsing a string configuration, which
  * is useful for command-line configuration of a {@code ClientSideLoggingBehavior.Builder}.
