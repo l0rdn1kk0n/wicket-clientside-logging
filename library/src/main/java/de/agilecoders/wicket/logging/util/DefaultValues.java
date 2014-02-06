@@ -19,11 +19,11 @@ public final class DefaultValues {
     public static final boolean logAdditionalErrors = true;
     public static final String customFilter = null;
 
-    public static final int maxQueueSize = 10;
+    public static final int maxQueueSize = 5;
     public static final String loggerName = "Log";
     public static final long collectionTimer = Duration.seconds(5).getMilliseconds();
     public static final CollectionType collectionType = CollectionType.Single;
-    public static int maxEntriesPerPage = 50;
+    public static int maxEntriesPerPage = 10;
     public static final boolean collectClientInfos = true;
 
     public static final String defaultMessage = "NULL_MSG";
