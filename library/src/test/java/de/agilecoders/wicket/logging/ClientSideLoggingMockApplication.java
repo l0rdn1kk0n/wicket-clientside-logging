@@ -1,6 +1,5 @@
 package de.agilecoders.wicket.logging;
 
-import de.agilecoders.wicket.logging.settings.ClientSideLoggingSettings;
 import org.apache.wicket.mock.MockApplication;
 
 /**
@@ -14,6 +13,6 @@ public class ClientSideLoggingMockApplication extends MockApplication {
     protected void init() {
         super.init();
 
-        ClientSideLoggingSettings.install(this);
+        ClientSideLogging.install(this);
     }
 }

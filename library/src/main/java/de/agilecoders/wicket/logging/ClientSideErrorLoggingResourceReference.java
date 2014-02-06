@@ -1,6 +1,6 @@
 package de.agilecoders.wicket.logging;
 
-import de.agilecoders.wicket.logging.settings.ClientSideLoggingSettings;
+import de.agilecoders.wicket.logging.settings.IClientSideLoggingSettings;
 import de.agilecoders.wicket.logging.util.EmptyResourceResponse;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.resource.AbstractResource;
@@ -16,8 +16,8 @@ public class ClientSideErrorLoggingResourceReference extends ResourceReference {
     /**
      * @return current active settings
      */
-    private static ClientSideLoggingSettings settings() {
-        return ClientSideLoggingSettings.get();
+    private static IClientSideLoggingSettings settings() {
+        return ClientSideLogging.settings();
     }
 
     /**

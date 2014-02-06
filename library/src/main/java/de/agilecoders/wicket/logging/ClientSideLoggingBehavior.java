@@ -1,6 +1,6 @@
 package de.agilecoders.wicket.logging;
 
-import de.agilecoders.wicket.logging.settings.ClientSideLoggingSettings;
+import de.agilecoders.wicket.logging.settings.IClientSideLoggingSettings;
 import de.agilecoders.wicket.logging.util.CollectionType;
 import de.agilecoders.wicket.logging.util.DefaultValues;
 import de.agilecoders.wicket.logging.util.SpecBuilder;
@@ -38,8 +38,8 @@ public class ClientSideLoggingBehavior extends Behavior {
     /**
      * @return current active settings
      */
-    private static ClientSideLoggingSettings settings() {
-        return ClientSideLoggingSettings.get();
+    private static IClientSideLoggingSettings settings() {
+        return ClientSideLogging.settings();
     }
 
     /**
@@ -267,12 +267,12 @@ public class ClientSideLoggingBehavior extends Behavior {
 
     @Override
     public void renderHead(Component component, IHeaderResponse response) {
-        final ClientSideLoggingSettings settings = settings();
+        final IClientSideLoggingSettings settings = settings();
 
         response.render(JavaScriptHeaderItem.forReference(Application.get().getJavaScriptLibrarySettings().getJQueryReference()));
         response.render(JavaScriptHeaderItem.forReference(WicketAjaxJQueryResourceReference.get()));
 
-        if (ClientSideLoggingSettings.get().logStacktrace()) {
+        if (settings.logStacktrace()) {
             response.render(JavaScriptHeaderItem.forReference(new WebjarsJavaScriptResourceReference("stacktrace/current/stacktrace.js")));
         }
 

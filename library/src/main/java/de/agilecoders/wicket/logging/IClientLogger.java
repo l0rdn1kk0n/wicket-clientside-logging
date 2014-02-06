@@ -64,7 +64,7 @@ public interface IClientLogger {
                 return;
             }
 
-            final ILogCleaner cleaner = ClientSideLoggingSettings.get().cleaner();
+            final ILogCleaner cleaner = ClientSideLogging.settings().cleaner();
 
             for (ClientSideLogObject logObject : logObjects) {
                 if (barrier.isAllowed(logObject)) {
