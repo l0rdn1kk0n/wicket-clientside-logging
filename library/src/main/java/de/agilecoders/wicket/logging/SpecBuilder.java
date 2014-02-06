@@ -33,6 +33,7 @@ public class SpecBuilder {
             .put("collectClientInfos", new BooleanParser(DefaultValues.collectClientInfos))
             .put("collectionTimer", new DurationParser(DefaultValues.collectionTimer))
             .put("maxQueueSize", new LongParser(DefaultValues.maxQueueSize))
+            .put("maxEntriesPerPage", new LongParser(DefaultValues.maxEntriesPerPage))
             .put("loggerName", new StringParser(DefaultValues.loggerName))
             .put("collectionType", new CollectionTypeParser(DefaultValues.collectionType))
             .build();

@@ -185,6 +185,16 @@ public class ClientSideLoggingBehavior extends Behavior {
             return this;
         }
 
+        public Builder maxEntriesPerPage(final int value) {
+            data.put("maxEntriesPerPage", value);
+
+            if (DefaultValues.maxEntriesPerPage == value) {
+                data.remove("maxEntriesPerPage");
+            }
+
+            return this;
+        }
+
         public Builder customFilter(final String value) {
             data.put("customFilter", value);
 

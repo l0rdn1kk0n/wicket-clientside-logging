@@ -23,12 +23,13 @@ public final class DefaultValues {
     public static final String loggerName = "Log";
     public static final long collectionTimer = Duration.seconds(5).getMilliseconds();
     public static final CollectionType collectionType = CollectionType.Single;
+    public static int maxEntriesPerPage = 50;
     public static final boolean collectClientInfos = true;
 
     public static final String defaultMessage = "NULL_MSG";
     public static final String defaultTimestamp = "NULL_TIMESTAMP";
-    public static final String defaultClientInfoValue = "NULL";
 
+    public static final String defaultClientInfoValue = "NULL";
     public static final String paramSplitter = "_";
     public static final char paramSplitterChar = paramSplitter.charAt(0);
 }

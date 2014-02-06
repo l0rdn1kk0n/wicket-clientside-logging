@@ -80,6 +80,7 @@ Configuration of ClientSideLoggingBehavior:
 		.collectClientInfos()			// If set to true some client data will be collected too; user-agent, screen/window size, ajaxBaseUrl (default: true)
 		.collectionTimer(duration)		// Sets the interval between two server calls, all messages between will be queued, this is only used if collectionType is set to "timer" (default: 5000)
 		.maxQueueSize(size)				// Sets the maximum queue size, if max size is exceeded all messages will be sent to server (default: 10)
+		.maxEntriesPerPage(size)		// Sets the maximum number of log entries can be sent to server, if max size is exceeded all messages will be dropped (default: 50)
 		.collectionType(type)			// Sets the collection type (default: single, other: timer, size, unload)
 		.customFilter(string)			// Sets the custom client side filter for log events (see QA: How to add client side filter?)
 		.loggerName(name)				// Sets the logger name that is used on client side, e.g. name="Log": Log.info('message'); (default: Log)

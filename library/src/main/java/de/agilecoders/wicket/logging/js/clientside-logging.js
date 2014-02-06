@@ -33,7 +33,7 @@
         return;
     }
 
-    var $, Wicket, amplify;
+    var $, Wicket, amplify, sentEntriesOnPage = 0;
 
     // cache window onerror calls before this plugin is initialized
     var cachedErrors = [];
@@ -198,13 +198,14 @@
 
         /**
          * checks whether logging is active for given log level
-         * or not.
+         * or not and checks the max number of log entries per page.
          *
          * @param {number} lvl the log level to check
          * @returns {boolean} TRUE, if logging is active for given log level
          */
         isLoggingActive: function (lvl) {
-            return defaults.logLevel > 0 && defaults.logLevel >= lvl;
+            return defaults.logLevel > 0 && defaults.logLevel >= lvl &&
+                   defaults.maxEntriesPerPage > (sentEntriesOnPage + queue.length);
         }
     };
 
@@ -271,8 +272,7 @@
         }
     };
 
-    var queue = [];
-    var noOfWinOnError = 0;
+    var queue = [], noOfWinOnError = 0;
     var defaults = {
         replaceWicketLog: false,
         replaceWindowOnError: false,
@@ -286,6 +286,7 @@
         url: null,
         method: 'POST',
         maxQueueSize: 10,
+        maxEntriesPerPage: 50,
         loggerName: "Log",
         customFilter: null,
         debug: false,
@@ -405,6 +406,8 @@
         if (!data || data.length <= 0) {
             return;
         }
+
+        sentEntriesOnPage = sentEntriesOnPage + data.length;
 
         // default mode is async
         async = async !== false;
