@@ -27,7 +27,7 @@ public final class ClientSideLogging {
      * @param application the application to add the settings to
      */
     public static void install(final WebApplication application) {
-        install(application, new ClientSideLoggingSettings());
+        install(application, null);
     }
 
     /**
@@ -36,11 +36,15 @@ public final class ClientSideLogging {
      * @param application the application to add the settings to
      * @param settings    the settings to add
      */
-    public static void install(final WebApplication application, final IClientSideLoggingSettings settings) {
+    public static void install(final WebApplication application, IClientSideLoggingSettings settings) {
         Args.notNull(application, "application");
 
         if (settings(application) == null) {
-            application.setMetaData(METADATA_KEY, Args.notNull(settings, "settings"));
+            if(settings == null) {
+                settings = new ClientSideLoggingSettings();
+            }
+
+            application.setMetaData(METADATA_KEY, settings);
 
             WicketWebjars.install(application);
         }
