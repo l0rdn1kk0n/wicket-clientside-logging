@@ -6,20 +6,20 @@ Current build status: [![Build Status](https://buildhive.cloudbees.com/job/l0rdn
 
 ## Dependencies
 
-* Apache Wicket (6.12.0): http://wicket.apache.org/
+* Apache Wicket (6.13.0): http://wicket.apache.org/
 
 ## Installation
 
 ### Maven
 
-wicket-clientside-logging is [available](http://search.maven.org/#artifactdetails|de.agilecoders.wicket|wicket-clientside-logging|0.1.6|jar) in Maven central repository.
+wicket-clientside-logging is [available](http://search.maven.org/#artifactdetails|de.agilecoders.wicket|wicket-clientside-logging|0.2.1|jar) in Maven central repository.
 
 core maven dependency:
 ```xml
 <dependency>
   <groupId>de.agilecoders.wicket</groupId>
   <artifactId>wicket-clientside-logging</artifactId>
-  <version>0.1.8</version>
+  <version>0.2.1</version>
 </dependency>
 ```
 
