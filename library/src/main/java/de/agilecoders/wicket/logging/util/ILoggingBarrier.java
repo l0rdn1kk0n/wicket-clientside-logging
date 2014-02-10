@@ -100,8 +100,6 @@ public interface ILoggingBarrier {
          * @throws Throwable if executor can't be stopped
          */
         protected void shutdownScheduledExecutorService() throws Throwable {
-            System.out.println("shutdownScheduledExecutorService, current size: " + counter.get());
-
             this.executor.shutdownNow();
             this.executor.awaitTermination(1, TimeUnit.SECONDS);
         }
@@ -110,14 +108,11 @@ public interface ILoggingBarrier {
          * this method is triggered after some period of time. The default implementation resets the counter.
          */
         protected void onTimerEvent() {
-            System.out.println("onTimerEvent, reset to " + maxSize + ", current size: " + counter.get());
             counter.set(maxSize);
         }
 
         @Override
         public boolean isAllowed(ClientSideLogObject logObject) {
-            System.out.println("isAllowed, current size: " + counter.get());
-
             return counter.decrementAndGet() > 0;
         }
 
