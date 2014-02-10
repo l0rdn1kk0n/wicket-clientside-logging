@@ -81,10 +81,6 @@ public class ClientSideLoggingBehaviorTest {
 
         assertThat(b.data().containsKey("dateFormat"), is(true));
         assertThat(b.data().get("dateFormat").toString(), is("dd.MM.yyyy"));
-
-        Label label = new Label("id", Model.of(""));
-        label.add(b.build());
-        tester.startComponentInPage(label);
     }
 
     public static class MyBehavior extends ClientSideLoggingBehavior {
