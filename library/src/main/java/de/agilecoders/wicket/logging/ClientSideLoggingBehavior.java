@@ -179,6 +179,16 @@ public class ClientSideLoggingBehavior extends Behavior {
             return this;
         }
 
+        public Builder dateFormat(final String value) {
+            data.put("dateFormat", value);
+
+            if (value == null || value.equals(DefaultValues.dateFormat)) {
+                data.remove("dateFormat");
+            }
+
+            return this;
+        }
+
         public Builder maxQueueSize(final int value) {
             data.put("maxQueueSize", value);
 
@@ -254,6 +264,10 @@ public class ClientSideLoggingBehavior extends Behavior {
         data.put("url", createCallbackUrl());
         data.put("logLevel", settings().level());
 
+        if (settings().dateFormat() != null && !data.containsKey("dateFormat")) {
+            data.put("dateFormat", settings().dateFormat());
+        }
+
         if (settings().logStacktrace() != DefaultValues.logStacktrace) {
             data.put("logStacktrace", settings().logStacktrace());
         }
@@ -281,6 +295,11 @@ public class ClientSideLoggingBehavior extends Behavior {
          */
         if (CollectionType.LocalStorage.asString().equals(data.get("collectionType"))) {
             response.render(JavaScriptHeaderItem.forReference(new WebjarsJavaScriptResourceReference("amplifyjs/current/amplify.store.min.js")));
+        }
+
+        // add momentjs javascript file if necessary
+        if (data.containsKey("dateFormat")) {
+            response.render(JavaScriptHeaderItem.forReference(new WebjarsJavaScriptResourceReference("momentjs/current/momentjs.min.js")));
         }
 
         response.render(settings.javaScriptHeaderItem());

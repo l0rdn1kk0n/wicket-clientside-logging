@@ -18,6 +18,11 @@ public interface IClientSideLoggingSettings {
     String level();
 
     /**
+     * @return the date format to use when logging client side events
+     */
+    String dateFormat();
+
+    /**
      * @return log message cleaner
      */
     ILogCleaner cleaner();

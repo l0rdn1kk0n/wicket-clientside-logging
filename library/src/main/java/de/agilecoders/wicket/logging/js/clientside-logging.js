@@ -281,6 +281,7 @@
         flushMessagesOnUnload: true,
         logStacktrace: false,
         logAdditionalErrors: true,
+        dateFormat: null,
         collectClientInfos: true,
         logLevel: WicketClientSideLogging.LVL_ERROR,
         url: null,
@@ -308,10 +309,10 @@
     }
 
     /**
-     * @returns {string} current timestamp as utc string
+     * @returns {number} current timestamp as integer since 1970
      */
     function currentTimestamp() {
-        return (new Date()).toUTCString();
+        return dateFormat ? moment().format(dateFormat) : +(new Date());
     }
 
     /**

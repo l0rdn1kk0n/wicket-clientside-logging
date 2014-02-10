@@ -17,6 +17,7 @@ public class ClientSideLoggingSettings implements IClientSideLoggingSettings {
 
     private String id = "client-side-logging";
     private String level = "error";
+    private String dateFormat = null;
     private boolean debug = false;
     private boolean logStacktrace = false;
     private ILogCleaner cleaner = new ILogCleaner.DefaultLogCleaner();
@@ -32,6 +33,17 @@ public class ClientSideLoggingSettings implements IClientSideLoggingSettings {
      */
     public ClientSideLoggingSettings level(final String level) {
         this.level = level;
+        return this;
+    }
+
+    /**
+     * sets the client side date format, if set to a non-null value, the momentjs js file be loaded too.
+     *
+     * @param dateFormat the date format to use on client side
+     * @return this instance for chaining
+     */
+    public ClientSideLoggingSettings dateFormat(final String dateFormat) {
+        this.dateFormat = dateFormat;
         return this;
     }
 
@@ -102,44 +114,32 @@ public class ClientSideLoggingSettings implements IClientSideLoggingSettings {
         return this;
     }
 
-    /**
-     * @return client side log level
-     */
+    @Override
     public String level() { return level; }
 
-    /**
-     * @return log message cleaner
-     */
+    @Override
+    public String dateFormat() {
+        return dateFormat;
+    }
+
+    @Override
     public ILogCleaner cleaner() { return cleaner; }
 
-    /**
-     * @return server side logger
-     */
+    @Override
     public IClientLogger logger() { return logger; }
 
-    /**
-     * @return use debug mode on client side
-     */
+    @Override
     public boolean debug() { return debug; }
 
-    /**
-     * @since 0.1.3
-     * @return TRUE, if stacktrace should be logged
-     */
+    @Override
     public boolean logStacktrace() { return logStacktrace; }
 
-    /**
-     * @return request parameter parser
-     */
+    @Override
     public IParamValueExtractor paramValueExtractor() { return paramValueExtractor; }
 
-    /**
-     * @return the library id (is used as logger name)
-     */
+    @Override
     public String id() { return id; }
 
-    /**
-     * @return the javascript resource reference as header item.
-     */
+    @Override
     public JavaScriptHeaderItem javaScriptHeaderItem() { return JavaScriptHeaderItem.forReference(reference); }
 }

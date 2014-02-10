@@ -19,7 +19,7 @@ public class ClientSideLogObjectTest {
 
         assertThat(logObject.level(), is(equalTo("error")));
         assertThat(logObject.message(), is(equalTo("message")));
-        assertThat(logObject.timestamp(), is(equalTo("timestamp")));
+        assertThat(logObject.timestamp(), is(equalTo(1234l)));
         assertThat(logObject.file(), is(equalTo("file")));
         assertThat(logObject.line(), is(equalTo("line")));
         assertThat(logObject.stacktrace(), is(equalTo("stacktrace")));

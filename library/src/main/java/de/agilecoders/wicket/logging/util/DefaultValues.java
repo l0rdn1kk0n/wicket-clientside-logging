@@ -13,6 +13,7 @@ public final class DefaultValues {
     public static final boolean replaceWicketLog = true;
     public static final boolean replaceWindowOnError = true;
     public static final boolean wrapWindowOnError = false;
+    public static final String dateFormat = null;
     public static final boolean wrapWicketLog = false;
     public static final boolean flushMessagesOnUnload = true;
     public static final boolean logStacktrace = false;
@@ -27,7 +28,7 @@ public final class DefaultValues {
     public static final boolean collectClientInfos = true;
 
     public static final String defaultMessage = "NULL_MSG";
-    public static final String defaultTimestamp = "NULL_TIMESTAMP";
+    public static final long defaultTimestamp = -1;
 
     public static final String defaultClientInfoValue = "NULL";
     public static final String paramSplitter = "_";

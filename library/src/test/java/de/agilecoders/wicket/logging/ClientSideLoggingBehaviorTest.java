@@ -1,6 +1,8 @@
 package de.agilecoders.wicket.logging;
 
 import de.agilecoders.wicket.logging.util.CollectionType;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.util.tester.WicketTester;
 import org.apache.wicket.util.time.Duration;
 import org.junit.After;
@@ -71,6 +73,18 @@ public class ClientSideLoggingBehaviorTest {
 
         assertThat(b.build(MyBehavior.class), is(notNullValue()));
         assertThat(b.build(MyBehavior.class), is(instanceOf(MyBehavior.class)));
+    }
+
+    @Test
+    public void dateFormatIsAdded() {
+        ClientSideLoggingBehavior.Builder b = ClientSideLoggingBehavior.newBuilder().dateFormat("dd.MM.yyyy");
+
+        assertThat(b.data().containsKey("dateFormat"), is(true));
+        assertThat(b.data().get("dateFormat").toString(), is("dd.MM.yyyy"));
+
+        Label label = new Label("id", Model.of(""));
+        label.add(b.build());
+        tester.startComponentInPage(label);
     }
 
     public static class MyBehavior extends ClientSideLoggingBehavior {

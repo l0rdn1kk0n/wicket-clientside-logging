@@ -43,9 +43,9 @@ public class IParamValueExtractorTest {
         IParamValueExtractor extractor = new IParamValueExtractor.DefaultParamValueExtractor();
 
         MockRequestParameters params = new MockRequestParameters();
-        addMessage(1, params, "error", "message 1", Time.valueOf(new Date(1982, 12, 14, 8, 0)).toRfc1123TimestampString(), "file1", "line1", "stacktrace 1");
-        addMessage(2, params, "error", "message 2", Time.valueOf(new Date(1982, 12, 14, 12, 0)).toRfc1123TimestampString(), "file2", "line2", "stacktrace 2");
-        addMessage(3, params, "error", "message 3", Time.valueOf(new Date(1982, 12, 14, 16, 0)).toRfc1123TimestampString(), "file3", "line3", "stacktrace 3");
+        addMessage(1, params, "error", "message 1", Time.valueOf(new Date(1982, 12, 14, 8, 0)).getMilliseconds(), "file1", "line1", "stacktrace 1");
+        addMessage(2, params, "error", "message 2", Time.valueOf(new Date(1982, 12, 14, 12, 0)).getMilliseconds(), "file2", "line2", "stacktrace 2");
+        addMessage(3, params, "error", "message 3", Time.valueOf(new Date(1982, 12, 14, 16, 0)).getMilliseconds(), "file3", "line3", "stacktrace 3");
 
         params.setParameterValue(ParamNames.LEVEL + "_" + 4, "warn");
         params.setParameterValue(ParamNames.MESSAGE + "_" + 5, "message 5");
@@ -54,15 +54,16 @@ public class IParamValueExtractorTest {
         IParamValueExtractor.Result result = extractor.parse(params);
 
         assertThat(Lists.newArrayList(result.logObjects()).size(), is(equalTo(3)));
-        assertThat(result.logObjects(), hasItem(new ClientSideLogObject("error", "message 1", Time.valueOf(new Date(1982, 12, 14, 8, 0)).toRfc1123TimestampString(), "file1", "line1", "stacktrace 1", 1)));
-        assertThat(result.logObjects(), hasItem(new ClientSideLogObject("error", "message 2", Time.valueOf(new Date(1982, 12, 14, 12, 0)).toRfc1123TimestampString(), "file2", "line2", "stacktrace 2", 2)));
-        assertThat(result.logObjects(), hasItem(new ClientSideLogObject("error", "message 3", Time.valueOf(new Date(1982, 12, 14, 16, 0)).toRfc1123TimestampString(), "file3", "line3", "stacktrace 3", 3)));
+        assertThat(result.logObjects(), hasItem(new ClientSideLogObject("error", "message 1", Time.valueOf(new Date(1982, 12, 14, 8, 0)).getMilliseconds(), "file1", "line1", "stacktrace 1", 1)));
+        assertThat(result.logObjects(), hasItem(new ClientSideLogObject("error", "message 2", Time.valueOf(new Date(1982, 12, 14, 12, 0)).getMilliseconds(), "file2", "line2", "stacktrace 2", 2)));
+        assertThat(result.logObjects(), hasItem(new ClientSideLogObject("error", "message 3", Time.valueOf(new Date(1982, 12, 14, 16, 0)).getMilliseconds(), "file3", "line3", "stacktrace 3", 3)));
     }
 
-    private void addMessage(int index, MockRequestParameters params, String level, String message, String utcTimestamp, String file, String line, String stacktrace) {
+    private void addMessage(int index, MockRequestParameters params, String level, String message, long utcTimestamp,
+                            String file, String line, String stacktrace) {
         params.setParameterValue(ParamNames.LEVEL + "_" + index, level);
         params.setParameterValue(ParamNames.MESSAGE + "_" + index, message);
-        params.setParameterValue(ParamNames.TIMESTAMP + "_" + index, utcTimestamp);
+        params.setParameterValue(ParamNames.TIMESTAMP + "_" + index, String.valueOf(utcTimestamp));
         params.setParameterValue(ParamNames.LINE + "_" + index, line);
         params.setParameterValue(ParamNames.FILE + "_" + index, file);
         params.setParameterValue(ParamNames.STACKTRACE + "_" + index, stacktrace);

@@ -30,7 +30,7 @@ public class ClientSideLogObject {
      * @param stacktrace the client side stacktrace
      * @param index      the parameter index that was used on client side to generate this log object
      */
-    public ClientSideLogObject(String lvl, String message, String timestamp, String file, String line,
+    public ClientSideLogObject(String lvl, String message, long timestamp, String file, String line,
                                String stacktrace, int index) {
         this(StringValue.valueOf(lvl), StringValue.valueOf(message), StringValue.valueOf(timestamp),
              StringValue.valueOf(file), StringValue.valueOf(line), StringValue.valueOf(stacktrace), index);
@@ -87,7 +87,6 @@ public class ClientSideLogObject {
         return file.toString("");
     }
 
-
     /**
      * @return the line in file that has thrown this error
      */
@@ -105,8 +104,8 @@ public class ClientSideLogObject {
     /**
      * @return timestamp as string or default timestamp if invalid
      */
-    public String timestamp() {
-        return timestamp.toString(DefaultValues.defaultTimestamp);
+    public long timestamp() {
+        return timestamp.toLong(DefaultValues.defaultTimestamp);
     }
 
     @Override

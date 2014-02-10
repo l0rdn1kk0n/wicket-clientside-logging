@@ -12,7 +12,7 @@ public final class Mocks {
     public static ClientSideLogObject createClientSideLogObject() {
         return new ClientSideLogObject(StringValue.valueOf("error"),
                                        StringValue.valueOf("message"),
-                                       StringValue.valueOf("timestamp"),
+                                       StringValue.valueOf(1234),
                                        StringValue.valueOf("file"),
                                        StringValue.valueOf("line"),
                                        StringValue.valueOf("stacktrace"),
