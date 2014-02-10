@@ -302,7 +302,9 @@
         var keys = [], key;
 
         for (key in collectionTypes) {
-            keys.push(key);
+            if (collectionTypes.hasOwnProperty(key)) {
+                keys.push(key);
+            }
         }
 
         return "Invalid collection type: " + type + "; must be one of: [" + keys.join(", ") + "]";
