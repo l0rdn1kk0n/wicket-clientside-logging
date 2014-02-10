@@ -312,7 +312,7 @@
      * @returns {number} current timestamp as integer since 1970
      */
     function currentTimestamp() {
-        return dateFormat ? moment().format(dateFormat) : +(new Date());
+        return defaults.dateFormat ? moment().format(defaults.dateFormat) : +(new Date());
     }
 
     /**
