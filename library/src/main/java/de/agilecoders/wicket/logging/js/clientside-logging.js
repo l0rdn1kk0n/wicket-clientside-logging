@@ -391,6 +391,7 @@
             }
         }
 
+        data.elements = i;
         return data;
     }
 
@@ -406,11 +407,11 @@
         }
 
         var data = prepareData(q);
-        if (!data || data.length <= 0) {
+        if (!data || data.elements <= 0) {
             return;
         }
 
-        sentEntriesOnPage = sentEntriesOnPage + data.length;
+        sentEntriesOnPage = sentEntriesOnPage + data.elements;
 
         // default mode is async
         async = async !== false;
@@ -432,7 +433,8 @@
      * @returns {boolean} whether to accept event or not (TRUE=send event to server, FALSE=skip)
      */
     function filter(event) {
-        return event != null && typeof defaults.customFilter === "function" && defaults.customFilter(event);
+        return event != null && (!defaults.customFilter ||
+                                 (typeof defaults.customFilter === "function" && defaults.customFilter(event)));
     }
 
     /**
