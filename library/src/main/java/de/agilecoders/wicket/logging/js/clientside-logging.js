@@ -391,7 +391,7 @@
             }
         }
 
-        data.elements = i;
+        data.elements = i - 1;
         return data;
     }
 
