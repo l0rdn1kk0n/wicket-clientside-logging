@@ -52,7 +52,7 @@ public interface ILoggingBarrier {
     /**
      * A special barrier that allows a maximum number of events in a time frame.
      */
-    public static final class SizeAndTimeFrameBasedBarrier implements ILoggingBarrier {
+    public static class SizeAndTimeFrameBasedBarrier implements ILoggingBarrier {
 
         private final ScheduledExecutorService executor;
         private final AtomicLong counter;
@@ -99,7 +99,7 @@ public interface ILoggingBarrier {
          *
          * @throws Throwable if executor can't be stopped
          */
-        protected void shutdownScheduledExecutorService() throws Throwable {
+        public void shutdownScheduledExecutorService() throws Throwable {
             this.executor.shutdownNow();
             this.executor.awaitTermination(1, TimeUnit.SECONDS);
         }
