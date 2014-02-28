@@ -34,6 +34,11 @@ public interface ILoggingBarrier {
     boolean isAllowed(Collection<ClientSideLogObject> logObjects);
 
     /**
+     * destroys the barrier.
+     */
+    void destroy() throws Throwable;
+
+    /**
      * Default implementation that allows everything.
      */
     public static final class AllowAllBarrier implements ILoggingBarrier {
@@ -46,6 +51,11 @@ public interface ILoggingBarrier {
         @Override
         public boolean isAllowed(Collection<ClientSideLogObject> logObjects) {
             return true;
+        }
+
+        @Override
+        public void destroy() throws Throwable {
+            // nothing to do.
         }
     }
 
@@ -99,7 +109,7 @@ public interface ILoggingBarrier {
          *
          * @throws Throwable if executor can't be stopped
          */
-        public void shutdownScheduledExecutorService() throws Throwable {
+        protected void shutdownScheduledExecutorService() throws Throwable {
             this.executor.shutdownNow();
             this.executor.awaitTermination(1, TimeUnit.SECONDS);
         }
@@ -122,11 +132,16 @@ public interface ILoggingBarrier {
         }
 
         @Override
+        public void destroy() throws Throwable {
+            if (!executor.isShutdown()) {
+                shutdownScheduledExecutorService();
+            }
+        }
+
+        @Override
         protected void finalize() throws Throwable {
             try {
-                if (!executor.isShutdown()) {
-                    shutdownScheduledExecutorService();
-                }
+                destroy();
             } catch (Throwable e) {
                 // ignore
             } finally {

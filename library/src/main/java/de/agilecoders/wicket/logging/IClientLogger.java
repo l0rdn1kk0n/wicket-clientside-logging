@@ -1,6 +1,5 @@
 package de.agilecoders.wicket.logging;
 
-import de.agilecoders.wicket.logging.settings.ClientSideLoggingSettings;
 import de.agilecoders.wicket.logging.util.ClientInfos;
 import de.agilecoders.wicket.logging.util.ILoggingBarrier;
 import org.slf4j.Logger;
@@ -23,6 +22,11 @@ public interface IClientLogger {
      * @param clientInfos the client information according to given logObjects.
      */
     void log(Collection<ClientSideLogObject> logObjects, ClientInfos clientInfos);
+
+    /**
+     * destroys the client logger.
+     */
+    void destroy() throws Throwable;
 
     /**
      * Default implementation of {@link IClientLogger} that uses slf4j as logger.
@@ -98,6 +102,11 @@ public interface IClientLogger {
                     }
                 }
             }
+        }
+
+        @Override
+        public void destroy() throws Throwable {
+            barrier.destroy();
         }
 
         /**
