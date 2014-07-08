@@ -261,7 +261,6 @@ public class ClientSideLoggingBehavior extends Behavior {
      * @param data initial configuration to use
      */
     public ClientSideLoggingBehavior(final Map<String, Object> data) {
-        data.put("url", createCallbackUrl());
         data.put("logLevel", settings().level());
 
         if (settings().dateFormat() != null && !data.containsKey("dateFormat")) {
@@ -282,6 +281,9 @@ public class ClientSideLoggingBehavior extends Behavior {
     @Override
     public void renderHead(Component component, IHeaderResponse response) {
         final IClientSideLoggingSettings settings = settings();
+
+        // createCallbackUrl must be called for each request, else it could be wrong because it is relative to ajax base url.
+        data.put("url", createCallbackUrl());
 
         response.render(JavaScriptHeaderItem.forReference(Application.get().getJavaScriptLibrarySettings().getJQueryReference()));
         response.render(JavaScriptHeaderItem.forReference(WicketAjaxJQueryResourceReference.get()));
