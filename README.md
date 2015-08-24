@@ -4,9 +4,10 @@ wicket-clientside-logging is a helper library that allows javascript logging on 
 
 Current build status: [![Build Status](https://buildhive.cloudbees.com/job/l0rdn1kk0n/job/wicket-clientside-logging/badge/icon)](https://buildhive.cloudbees.com/job/l0rdn1kk0n/job/wicket-clientside-logging/) [![Build Status](https://travis-ci.org/l0rdn1kk0n/wicket-clientside-logging.png?branch=master)](https://travis-ci.org/l0rdn1kk0n/wicket-clientside-logging)
 
-## Dependencies
+## Current release version:
 
-* Apache Wicket (6.13.0): http://wicket.apache.org/
+* [Wicket 7.x](http://wicket.apache.org/):  0.4.0
+* [Wicket 6.x](http://wicket.apache.org/): 0.3.3
 
 ## Installation
 
@@ -19,7 +20,7 @@ core maven dependency:
 <dependency>
   <groupId>de.agilecoders.wicket</groupId>
   <artifactId>wicket-clientside-logging</artifactId>
-  <version>0.3.1</version>
+  <version>0.4.0</version>
 </dependency>
 ```
 
