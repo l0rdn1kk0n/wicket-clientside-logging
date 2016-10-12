@@ -274,10 +274,10 @@
 
     var queue = [], noOfWinOnError = 0;
     var defaults = {
-        replaceWicketLog: false,
-        replaceWindowOnError: false,
-        wrapWindowOnError: true,
-        wrapWicketLog: true,
+        replaceWicketLog: true,
+        replaceWindowOnError: true,
+        wrapWindowOnError: false,
+        wrapWicketLog: false,
         flushMessagesOnUnload: true,
         logStacktrace: false,
         logAdditionalErrors: true,
@@ -286,8 +286,8 @@
         logLevel: WicketClientSideLogging.LVL_ERROR,
         url: null,
         method: 'POST',
-        maxQueueSize: 10,
-        maxEntriesPerPage: 50,
+        maxQueueSize: 5,
+        maxEntriesPerPage: 10,
         loggerName: "Log",
         customFilter: null,
         debug: false,
@@ -560,7 +560,7 @@
             level = logLevels.LVL_ERROR;
         }
 
-        // limit level to a reasonable value, i.e. a non-negative integer 
+        // limit level to a reasonable value, i.e. a non-negative integer
         return Math.max(0, Math.floor(level));
     }
 
