@@ -64,15 +64,15 @@
         <mvn.build.java.version>1.7</mvn.build.java.version>
         <mvn.version>3.0.0</mvn.version>
 
-        <wicket.version>7.0.0</wicket.version>
-        <wicket-webjars.version>0.5.3</wicket-webjars.version>
+        <wicket.version>7.4.0</wicket.version>
+        <wicket-webjars.version>0.5.5</wicket-webjars.version>
         <stacktrace-js.version>0.5.0</stacktrace-js.version>
         <amplify-js.version>1.1.0</amplify-js.version>
 
-        <com.google.guava.version>18.0</com.google.guava.version>
+        <com.google.guava.version>19.0</com.google.guava.version>
         <junit.version>4.12</junit.version>
         <mockito.version>1.9.5</mockito.version>
-        <slf4j.version>1.7.12</slf4j.version>
+        <slf4j.version>1.7.21</slf4j.version>
         <versions-maven-plugin.version>1.3.1</versions-maven-plugin.version>
         <doxia.version>1.0</doxia.version>
         <hamcrest.version>1.3</hamcrest.version>
@@ -206,7 +206,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.5.1</version>
                 <configuration>
                     <source>${mvn.build.java.version}</source>
                     <target>${mvn.build.java.version}</target>
